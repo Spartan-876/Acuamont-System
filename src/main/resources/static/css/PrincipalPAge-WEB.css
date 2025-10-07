@@ -1,0 +1,32 @@
+
+.btn-custom{
+    background-color: var(--color-primary);
+    color: var(--color-secondary);
+}
+
+.btn-custom:hover{
+    background-color: var(--color-primary);
+    color: var(--color-secondary);
+}
+
+.btn-custom-light{
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+}
+
+.btn-custom-light:hover{
+    background-color: #f2f2f2;
+    color: var(--color-primary);
+}
+
+.coments-custom{
+    background-color: var(--color-primary-light);
+}
+
+.carousel img{
+    max-height: 700px;
+    object-fit: cover;
+    object-position: center;
+}
+
