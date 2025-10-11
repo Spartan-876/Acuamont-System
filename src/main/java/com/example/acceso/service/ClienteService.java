@@ -38,6 +38,10 @@ public class ClienteService {
                     throw new IllegalArgumentException("El teléfono es obligatorio");
                 }
 
+                if(cliente.getCorreo()==null || cliente.getCorreo().trim().isEmpty() ) {
+                    throw new IllegalArgumentException("El correo es obligatorio");
+                }
+
                 Optional<Cliente> existente = clienteRepository.findByDocumento(cliente.getDocumento());
                 if (existente.isPresent() && !existente.get().getId().equals(cliente.getId())) {
                     throw new IllegalArgumentException("Ya existe un cliente con el mismo documento");

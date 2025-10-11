@@ -10,16 +10,16 @@ $(document).ready(function () {
         get: (id) => `${API_BASE_URL}/${id}`,
         delete: (id) => `${API_BASE_URL}/eliminar/${id}`,
         toggleStatus: (id) => `${API_BASE_URL}/cambiar-estado/${id}`,
-        buscarDni: (dni) => `${API_BASE_URL}/buscar-dni/${dni}`
+        buscarDocumento: (dni) => `${API_BASE_URL}/buscar-documento/${dni}`
     };
 
     initializeDataTable();
 
     clienteModal = new bootstrap.Modal(document.getElementById('clienteModal'));
 
-    $('#btnBuscarDni').on('click', function () {
-        const dni = $('#documento').val().trim();
-        buscarDniEnSunat(dni);
+    $('#btnBuscarDocumento').on('click', function () {
+        const doc = $('#documento').val().trim();
+        buscarDocumento(doc);
     });
 
     setupEventListeners();
@@ -39,6 +39,7 @@ $(document).ready(function () {
                 { data: 'nombre' },
                 { data: 'documento' },
                 { data: 'telefono' },
+                {data: 'correo'},
                 {
                     data: 'estado', render: function (data, type, row) {
                         return data === 1
@@ -117,7 +118,8 @@ $(document).ready(function () {
             id: $('#id').val(),
             nombre: $('#nombre').val(),
             documento: $('#documento').val(),
-            telefono: $('#telefono').val()
+            telefono: $('#telefono').val(),
+            correo: $('#correo').val()
         };
 
         if (!validateForm(formData)) {
@@ -268,6 +270,7 @@ $(document).ready(function () {
         $('#nombre').val(cliente.nombre).prop('readonly', true);
         $('#documento').val(cliente.documento).prop('readonly', true);
         $('#telefono').val(cliente.telefono);
+        $('#correo').val(cliente.correo);
         showModal();
     }
 
@@ -305,8 +308,12 @@ $(document).ready(function () {
             showFieldError('telefono', 'El teléfono es obligatorio.');
             hasErrors = true;
         }
-        if (formData.telefono && !/^\d{9}$/.test(formData.telefono.trim())) {
-            showFieldError('telefono', 'El teléfono debe tener 9 dígitos.');
+        if (formData.telefono && !/^\d{9}$/.test(formData.telefono.trim() || formData.telefono.contains(' '))) {
+            showFieldError('telefono', 'El teléfono debe tener 9 dígitos, sin espacios.');
+            hasErrors = true;
+        }
+        if (!formData.correo || formData.correo.trim() === '') {
+            showFieldError('correo', 'El correo es obligatorio.');
             hasErrors = true;
         }
 
@@ -316,6 +323,14 @@ $(document).ready(function () {
     function clearFieldErrors() {
         $('.invalid-feedback').text('');
         $('#formCliente .form-control').removeClass('is-invalid');
+    }
+
+    function showFieldError(fieldName, message) {
+            const field = $(`#${fieldName}`);
+            const errorDiv = $(`#${fieldName}-error`);
+
+            field.addClass('is-invalid');
+            errorDiv.text(message);
     }
 
     function showNotification(message, type = 'success') {
@@ -349,38 +364,45 @@ $(document).ready(function () {
         }
     }
 
-    function buscarDniEnSunat(dni) {
-        if (!dni || dni.length !== 8 || isNaN(dni)) {
-            showNotification('Ingrese un DNI válido de 8 dígitos', 'error');
+    function buscarDocumento(doc) {
+        if (!doc || (doc.length !== 8 && doc.length !== 11) || isNaN(doc)) {
+            showNotification('Ingrese un DNI válido de 8 dígitos o RUC de 11 dígitos', 'error');
             return;
         }
 
         showLoading(true);
 
-        fetch(ENDPOINTS.buscarDni(dni))
+        fetch(ENDPOINTS.buscarDocumento(doc))
             .then(response => response.json())
             .then(data => {
                 console.log("Respuesta del servidor:", data);
 
                 if (data.success && data.datos) {
                     const persona = data.datos;
-                    $('#nombre').val(`${persona.nombres || ''} ${persona.ape_paterno || ''} ${persona.ape_materno || ''}`.trim());
-                    $('#documento').val(persona.dni || dni);
 
-                    showNotification('Datos del DNI obtenidos correctamente', 'success');
+                    if (doc.length === 8) {
+                        $('#nombre').val(`${persona.nombres || ''} ${persona.ape_paterno || ''} ${persona.ape_materno || ''}`.trim());
+                        $('#documento').val(persona.dni || doc);
+                    } else if (doc.length === 11) {
+                        $('#nombre').val(persona.razon_social || '');
+                        $('#documento').val(persona.ruc || doc);
+                    }
+
+                    showNotification('Datos obtenidos correctamente', 'success');
                 } else {
-                    showNotification(data.message || 'No se encontró información para el DNI ingresado', 'error');
+                    showNotification(data.message || 'No se encontró información para el documento ingresado', 'error');
                     $('#nombre').val('');
                     $('#documento').val('');
                 }
             })
             .catch(error => {
-                console.error('Error al consultar el DNI:', error);
-                showNotification('Ocurrió un error al buscar el DNI', 'error');
+                console.error('Error al consultar el documento:', error);
+                showNotification('Ocurrió un error al buscar el documento', 'error');
             })
             .finally(() => {
                 showLoading(false);
             });
     }
+
 
 });

@@ -1,6 +1,7 @@
 package com.example.acceso.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -27,16 +28,22 @@ public class Cliente {
     @Column(nullable = false, length = 9)
     private String telefono;
 
+    @NotBlank(message = "El correo es obligatorio")
+    @Email(message = "El correo debe tener un formato válido")
+    @Column(nullable = false, unique = true)
+    private String correo;
+
     @Column(nullable = false)
     private Integer estado = 1;
 
     public Cliente() {
     }
 
-    public Cliente(String nombre, String documento, String telefono) {
+    public Cliente(String nombre, String documento, String telefono, String correo) {
         this.nombre = nombre;
         this.documento = documento;
         this.telefono = telefono;
+        this.correo = correo;
     }
 
     public Long getId() {
@@ -77,5 +84,13 @@ public class Cliente {
 
     public void setEstado(Integer estado) {
         this.estado = estado;
+    }
+
+    public String getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
     }
 }

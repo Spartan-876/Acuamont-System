@@ -132,34 +132,47 @@ public class ClienteController {
         }
     }
 
-    @GetMapping("/api/buscar-dni/{dni}")
+    @GetMapping("/api/buscar-documento/{documento}")
     @ResponseBody
-    public ResponseEntity<?> buscarPorDni(@PathVariable String dni) {
+    public ResponseEntity<?> buscarPorDocumento(@PathVariable String documento) {
         String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozNDIsImV4cCI6MTc2MDM3NTYzNH0.boaa7iYa3cB69Ynpvv9yPHY6GIG_419dcyUAkENPWa0";
-        String url = "https://miapi.cloud/v1/dni/" + dni; // ✅ endpoint correcto
+        String url;
+
+        if (documento.length() == 8) {
+            url = "https://miapi.cloud/v1/dni/" + documento;
+        } else if (documento.length() == 11) {
+            url = "https://miapi.cloud/v1/ruc/" + documento;
+        } else {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("success", false, "message", "Documento inválido"));
+        }
 
         try {
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "Bearer " + token);
             HttpEntity<String> entity = new HttpEntity<>(headers);
+
             ResponseEntity<Map> response = restTemplate.exchange(
                     url,
                     HttpMethod.GET,
                     entity,
                     Map.class
             );
+
             Map body = response.getBody();
             if (body == null || !Boolean.TRUE.equals(body.get("success"))) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("success", false, "message", "No se encontró información para el DNI ingresado"));
+                        .body(Map.of("success", false, "message", "No se encontró información para el documento ingresado"));
             }
+
             return ResponseEntity.ok(body);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("success", false, "message", "Error al consultar el DNI: " + e.getMessage()));
+                    .body(Map.of("success", false, "message", "Error al consultar el documento: " + e.getMessage()));
         }
     }
+
 
 
 }

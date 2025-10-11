@@ -296,7 +296,7 @@ $(document).ready(function() {
         const errorDiv = $(`#${fieldName}-error`);
 
         field.addClass('is-invalid');
-        errorDiv.text(message).show();
+        errorDiv.text(message);
     }
 
     function clearFieldErrors() {
