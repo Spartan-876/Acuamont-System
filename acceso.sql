@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 01-10-2025 a las 23:13:12
+-- Tiempo de generación: 12-10-2025 a las 04:44:10
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -48,6 +48,44 @@ INSERT INTO `categorias` (`id`, `nombre`, `estado`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `clientes`
+--
+
+CREATE TABLE `clientes` (
+  `id` bigint(20) NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `documento` varchar(255) NOT NULL,
+  `telefono` varchar(9) NOT NULL,
+  `estado` int(11) NOT NULL,
+  `correo` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `clientes`
+--
+
+INSERT INTO `clientes` (`id`, `nombre`, `documento`, `telefono`, `estado`, `correo`) VALUES
+(1, 'CLIENTES VARIOS', '00000000', '999999999', 1, 'cliente@email.com'),
+(2, 'IRMA DEL CARMEN CORIA SANCHEZ', '60051938', '913048859', 2, 'prueba@email.com'),
+(3, 'JOHN ANDERSON CHAPOÑAN MONTAÑO', '60051937', '913048853', 1, 'john@email.com'),
+(4, 'GABRIELA ALEXANDRA TABOADA MIMBELA', '70497204', '931680722', 1, 'alexandra@email.com'),
+(5, 'CORPORACION JARD S.A.C.', '20613407279', '999888777', 1, 'corporacion@email.com');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `forma_pago`
+--
+
+CREATE TABLE `forma_pago` (
+  `id` bigint(20) NOT NULL,
+  `estado` int(11) NOT NULL,
+  `nombre` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `opciones`
 --
 
@@ -68,7 +106,8 @@ INSERT INTO `opciones` (`id`, `nombre`, `ruta`, `icono`) VALUES
 (3, 'Gestión de Perfiles', '/perfiles/listar', 'bi-person-badge'),
 (4, 'Gestión de Categorias', '/categorias/listar', 'bi-card-checklist'),
 (5, 'Gestion de Productos', '/productos/listar', 'bi-box'),
-(6, 'Gestión de Slides', '/slides/listar', 'bi-card-image');
+(6, 'Gestión de Imagenes', '/slides/listar', 'bi-card-image'),
+(7, 'Gestión de Clientes', '/clientes/listar', 'bi-people');
 
 -- --------------------------------------------------------
 
@@ -114,6 +153,7 @@ INSERT INTO `perfil_opcion` (`id_perfil`, `id_opcion`) VALUES
 (1, 4),
 (1, 5),
 (1, 6),
+(1, 7),
 (2, 1),
 (2, 2),
 (3, 1),
@@ -158,6 +198,29 @@ INSERT INTO `productos` (`id`, `nombre`, `descripcion`, `precio_compra`, `precio
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `series_comprobante`
+--
+
+CREATE TABLE `series_comprobante` (
+  `id` bigint(20) NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `serie` varchar(100) NOT NULL,
+  `correlativo_actual` int(11) NOT NULL,
+  `estado` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `series_comprobante`
+--
+
+INSERT INTO `series_comprobante` (`id`, `nombre`, `serie`, `correlativo_actual`, `estado`) VALUES
+(1, 'Nota de Venta', 'N0001', 1, 1),
+(2, 'Boleta', 'B0001', 1, 1),
+(3, 'Factura', 'F0001', 1, 1);
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `usuarios`
 --
 
@@ -193,6 +256,19 @@ ALTER TABLE `categorias`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indices de la tabla `clientes`
+--
+ALTER TABLE `clientes`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `documento` (`documento`);
+
+--
+-- Indices de la tabla `forma_pago`
+--
+ALTER TABLE `forma_pago`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indices de la tabla `opciones`
 --
 ALTER TABLE `opciones`
@@ -221,6 +297,12 @@ ALTER TABLE `productos`
   ADD KEY `fk_producto_categoria` (`id_categoria`);
 
 --
+-- Indices de la tabla `series_comprobante`
+--
+ALTER TABLE `series_comprobante`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indices de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
@@ -239,10 +321,22 @@ ALTER TABLE `categorias`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
+-- AUTO_INCREMENT de la tabla `clientes`
+--
+ALTER TABLE `clientes`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT de la tabla `forma_pago`
+--
+ALTER TABLE `forma_pago`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `opciones`
 --
 ALTER TABLE `opciones`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de la tabla `perfiles`
@@ -255,6 +349,12 @@ ALTER TABLE `perfiles`
 --
 ALTER TABLE `productos`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT de la tabla `series_comprobante`
+--
+ALTER TABLE `series_comprobante`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`

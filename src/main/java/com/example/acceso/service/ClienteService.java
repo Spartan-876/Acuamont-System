@@ -34,18 +34,11 @@ public class ClienteService {
                     throw new IllegalArgumentException("El documento es obligatorio");
                 }
 
-                if (cliente.getTelefono()==null || cliente.getTelefono().trim().isEmpty() ) {
-                    throw new IllegalArgumentException("El teléfono es obligatorio");
-                }
-
-                if(cliente.getCorreo()==null || cliente.getCorreo().trim().isEmpty() ) {
-                    throw new IllegalArgumentException("El correo es obligatorio");
-                }
-
                 Optional<Cliente> existente = clienteRepository.findByDocumento(cliente.getDocumento());
                 if (existente.isPresent() && !existente.get().getId().equals(cliente.getId())) {
                     throw new IllegalArgumentException("Ya existe un cliente con el mismo documento");
                 }
+
 
                 return clienteRepository.save(cliente);
             } catch (DataIntegrityViolationException e) {

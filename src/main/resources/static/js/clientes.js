@@ -304,17 +304,12 @@ $(document).ready(function () {
             showFieldError('documento', 'El documento es obligatorio.');
             hasErrors = true;
         }
-        if (!formData.telefono || formData.telefono.trim() === '') {
-            showFieldError('telefono', 'El teléfono es obligatorio.');
-            hasErrors = true;
-        }
-        if (formData.telefono && !/^\d{9}$/.test(formData.telefono.trim() || formData.telefono.contains(' '))) {
-            showFieldError('telefono', 'El teléfono debe tener 9 dígitos, sin espacios.');
-            hasErrors = true;
-        }
-        if (!formData.correo || formData.correo.trim() === '') {
-            showFieldError('correo', 'El correo es obligatorio.');
-            hasErrors = true;
+
+        if( !formData.telefono && !formData.telefono.trim() === '') {
+            if (formData.telefono && !/^\d{9}$/.test(formData.telefono.trim() || formData.telefono.contains(' '))) {
+                showFieldError('telefono', 'El teléfono debe tener 9 dígitos, sin espacios.');
+                hasErrors = true;
+            }
         }
 
         return !hasErrors;
