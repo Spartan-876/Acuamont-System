@@ -1,5 +1,6 @@
 package com.example.acceso.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
@@ -50,21 +51,21 @@ public class Venta {
     @OneToMany(
             mappedBy = "venta",
             cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY,
             orphanRemoval = true
     )
+    @JsonManagedReference("venta-cuotas")
     private List<Cuota> cuotas = new ArrayList<>();
 
     @OneToMany(
             mappedBy = "venta",
             cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY,
             orphanRemoval = true
     )
+    @JsonManagedReference("venta-detalles")
     private List<DetalleVenta> detalleVentas = new ArrayList<>();
 
     @Column(nullable = false)
-    private Integer estado = 1;
+    private Integer estado = 1; // 1 = Pagado, 0 = Pendiente, 2 = Eliminado
 
     public Venta() {}
 

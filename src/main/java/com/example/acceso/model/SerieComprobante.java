@@ -2,6 +2,7 @@ package com.example.acceso.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 @Entity
@@ -22,7 +23,7 @@ public class SerieComprobante {
     @Column(nullable = false, length = 100)
     private String serie;
 
-    @NotBlank(message = "El correlativo es obligatorio")
+    @NotNull(message = "El correlativo actual no puede ser nulo")
     @Column(nullable = false)
     private Integer correlativo_actual;
 

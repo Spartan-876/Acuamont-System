@@ -33,7 +33,7 @@ public class CategoriaController {
         return "categorias";
     }
 
-    @GetMapping("api/listar")
+    @GetMapping("/api/listar") // cambio de prueba
     @ResponseBody
     public ResponseEntity<?> listarCategoriasApi() {
         Map<String, Object> response = new HashMap<>();

@@ -11,6 +11,8 @@ public interface CuotaRepository extends JpaRepository<Cuota, Long> {
 
     List<Cuota> findAllByEstadoNot(Integer estado);
 
+    List<Cuota> findByVentaId(Long ventaId);
+
     Long countByEstado(Integer estado);
 
 }

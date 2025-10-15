@@ -1,5 +1,6 @@
 package com.example.acceso.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -14,6 +15,7 @@ public class DetalleVenta {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_venta", nullable = false)
+    @JsonBackReference("venta-detalles")
     private Venta venta;
 
     @ManyToOne(optional = false)

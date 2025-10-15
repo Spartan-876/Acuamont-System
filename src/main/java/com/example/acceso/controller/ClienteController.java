@@ -2,6 +2,7 @@ package com.example.acceso.controller;
 
 import com.example.acceso.model.Cliente;
 import com.example.acceso.service.ClienteService;
+import jakarta.validation.Valid;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -173,6 +174,20 @@ public class ClienteController {
         }
     }
 
-
-
+    @GetMapping("/api/buscar-cliente-documento/{documento}")
+    public ResponseEntity<?> buscarPorDocumentoInterno(@PathVariable String documento) {
+        return clienteService.obtenerClientePorDocumento(documento)
+                .map(cliente -> {
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("success", true);
+                    response.put("data", cliente);
+                    return ResponseEntity.ok(response);
+                })
+                .orElseGet(() -> {
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("success", false);
+                    response.put("message", "Cliente no encontrado en la base de datos local.");
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+                });
+    }
 }

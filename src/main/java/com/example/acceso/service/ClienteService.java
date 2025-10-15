@@ -67,6 +67,11 @@ public class ClienteService {
         }
 
         @Transactional
+        public Optional<Cliente> obtenerClientePorDocumento(String documento) {
+            return clienteRepository.findByDocumento(documento);
+        }
+
+        @Transactional
         public void eliminarCliente(Long id) {
             if (id == null || id <= 0) {
                 throw new IllegalArgumentException("ID de cliente inválido");

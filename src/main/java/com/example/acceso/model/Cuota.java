@@ -1,7 +1,9 @@
 package com.example.acceso.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -12,29 +14,30 @@ public class Cuota {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
+    @ManyToOne
     @JoinColumn(name = "id_venta", nullable = false)
+    @JsonBackReference("venta-cuotas")
     private Venta venta;
 
     @Column(nullable = false)
     private Integer numeroCuota;
 
     @Column(nullable = false)
-    private Double monto;
+    private BigDecimal monto;
 
     @Column(nullable = false)
-    private Double saldo;
+    private BigDecimal saldo;
 
     @Column(nullable = false)
     private LocalDate fechaVencimiento;
 
     @Column(nullable = false)
-    private Integer estado = 1;
+    private Integer estado = 0;// 0 = pendiente, 1 = pagada
 
     public Cuota() {
     }
 
-    public Cuota(Venta venta, Integer numeroCuota, Double monto, Double saldo, LocalDate fechaVencimiento) {
+    public Cuota(Venta venta, Integer numeroCuota, BigDecimal monto, BigDecimal saldo, LocalDate fechaVencimiento) {
         this.venta = venta;
         this.numeroCuota = numeroCuota;
         this.monto = monto;
@@ -66,19 +69,19 @@ public class Cuota {
         this.numeroCuota = numeroCuota;
     }
 
-    public Double getMonto() {
+    public BigDecimal getMonto() {
         return monto;
     }
 
-    public void setMonto(Double monto) {
+    public void setMonto(BigDecimal monto) {
         this.monto = monto;
     }
 
-    public Double getSaldo() {
+    public BigDecimal getSaldo() {
         return saldo;
     }
 
-    public void setSaldo(Double saldo) {
+    public void setSaldo(BigDecimal saldo) {
         this.saldo = saldo;
     }
 

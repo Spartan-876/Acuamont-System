@@ -2,6 +2,7 @@ package com.example.acceso.model;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -17,7 +18,7 @@ public class Pago {
     private Cuota cuota;
 
     @Column(nullable = false)
-    private Double montoPagado;
+    private BigDecimal montoPagado;
 
     @Column(nullable = false)
     private LocalDateTime fechaPago;
@@ -26,11 +27,11 @@ public class Pago {
     private String metodoPago;
 
     @Column(nullable = false)
-    private Integer estado = 1;
+    private Integer estado = 1; // 1 = Activo, 0 = Inactivo
 
     public Pago() {}
 
-    public Pago(Cuota cuota, Double montoPagado, LocalDateTime fechaPago, String metodoPago) {
+    public Pago(Cuota cuota, BigDecimal montoPagado, LocalDateTime fechaPago, String metodoPago) {
         this.cuota = cuota;
         this.montoPagado = montoPagado;
         this.fechaPago = fechaPago;
@@ -53,11 +54,11 @@ public class Pago {
         this.cuota = cuota;
     }
 
-    public Double getMontoPagado() {
+    public BigDecimal getMontoPagado() {
         return montoPagado;
     }
 
-    public void setMontoPagado(Double montoPagado) {
+    public void setMontoPagado(BigDecimal montoPagado) {
         this.montoPagado = montoPagado;
     }
 

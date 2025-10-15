@@ -1,0 +1,30 @@
+package com.example.acceso.controller;
+
+import com.example.acceso.DTO.PagosDTO;
+import com.example.acceso.model.Venta;
+import com.example.acceso.service.VentaService;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/pagos")
+public class PagoController {
+
+    private final VentaService ventaService;
+
+    public PagoController(VentaService ventaService) {
+        this.ventaService = ventaService;
+    }
+
+    @PostMapping("/api/registrarPago")
+    public ResponseEntity<Venta> registrarPago(@Valid @RequestBody PagosDTO pagoRequest) {
+
+        Venta ventaActualizada = ventaService.registrarPago(pagoRequest);
+        return ResponseEntity.ok(ventaActualizada);
+    }
+
+}

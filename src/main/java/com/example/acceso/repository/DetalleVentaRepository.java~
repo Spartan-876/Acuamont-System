@@ -1,2 +1,0 @@
-package com.example.acceso.repository;public interface DetalleVentaRepository {
-}
