@@ -53,9 +53,54 @@ $(document).ready(function () {
                 { responsivePriority: 3, targets: 3 },
             ],
             language: {
-                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
+                url: 'https://cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
             },
-            pageLength: 10
+            pageLength: 10,
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    text: '<i class="bi bi-file-earmark-excel"></i> Exportar a Excel',
+                    title: 'Listado de Inventarios',
+                    className: 'btn btn-success',
+                    exportOptions: {
+                        columns: [0, 1, 2],
+                        modifier: {
+                            page: 'all'
+                        }
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    text: '<i class="bi bi-file-earmark-pdf"></i> Exportar a PDF',
+                    title: 'Listado de Inventarios',
+                    className: 'btn btn-danger',
+                    pageSize: 'A4',
+                    exportOptions: {
+                        columns: [0, 1, 2],
+                        modifier: {
+                            page: 'all'
+                        }
+                    }
+                },
+                {
+                    extend: 'print',
+                    text: '<i class="bi bi-printer"></i> Imprimir',
+                    className: 'btn btn-info',
+                    pageSize: 'A4',
+                    exportOptions: {
+                        columns: [0, 1, 2],
+                        modifier: {
+                            page: 'all'
+                        }
+                    },
+                    customize: function (win) {
+                        $(win.document.body)
+                            .css('font-size', '10pt')
+                            .prepend('<h3 style="text-align:center;">Listado de Productos</h3>');
+                    }
+                }
+            ]
         });
     }
 
@@ -129,7 +174,53 @@ $(document).ready(function () {
                             emptyTable: 'Sin movimientos registrados',
                             paginate: { next: 'Siguiente', previous: 'Anterior' }
                         },
-                        createdRow: row => $(row).addClass('align-middle')
+                        createdRow: row => $(row).addClass('align-middle'),
+                        dom: 'Bfrtip',
+                        buttons: [
+                            {
+                                extend: 'excelHtml5',
+                                text: '<i class="bi bi-file-earmark-excel"></i> Exportar a Excel',
+                                title: `Listado de Movimientos de ${productoNombre}`,
+                                className: 'btn btn-success',
+                                exportOptions: {
+                                    columns: [0, 1, 2, 3, 4],
+                                    modifier: {
+                                        page: 'all'
+                                    }
+                                }
+                            },
+                            {
+                                extend: 'pdfHtml5',
+                                text: '<i class="bi bi-file-earmark-pdf"></i> Exportar a PDF',
+                                title: `Listado de Movimientos de ${productoNombre}`,
+                                className: 'btn btn-danger',
+                                pageSize: 'A4',
+                                exportOptions: {
+                                    columns: [0, 1, 2, 3, 4],
+                                    modifier: {
+                                        page: 'all'
+                                    }
+                                }
+                            },
+                            {
+                                extend: 'print',
+                                text: '<i class="bi bi-printer"></i> Imprimir',
+                                title: `Listado de Movimientos de ${productoNombre}`,
+                                className: 'btn btn-info',
+                                pageSize: 'A4',
+                                exportOptions: {
+                                    columns: [0, 1, 2, 3, 4],
+                                    modifier: {
+                                        page: 'all'
+                                    }
+                                },
+                                customize: function (win) {
+                                    $(win.document.body)
+                                        .css('font-size', '10pt')
+                                        .prepend('<h3 style="text-align:center;">Listado de Productos</h3>');
+                                }
+                            }
+                        ]
                     });
                 }
             })

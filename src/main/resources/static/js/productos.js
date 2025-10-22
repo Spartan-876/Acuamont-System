@@ -52,7 +52,7 @@ $(document).ready(function () {
                 {
                     data: 'precioCompra',
                     render: function (data, type, row) {
-                        return new Intl.NumberFormat('es-PE',{
+                        return new Intl.NumberFormat('es-PE', {
                             style: 'currency', currency: 'PEN'
                         }).format(data);
                     }
@@ -60,7 +60,7 @@ $(document).ready(function () {
                 {
                     data: 'precioVenta',
                     render: function (data, type, row) {
-                        return new Intl.NumberFormat('es-PE',{
+                        return new Intl.NumberFormat('es-PE', {
                             style: 'currency', currency: 'PEN'
                         }).format(data);
                     }
@@ -96,9 +96,56 @@ $(document).ready(function () {
                 { responsivePriority: 10, targets: 10 },
             ],
             language: {
-                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
+                url: 'https://cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
             },
-            pageLength: 10
+            pageLength: 10,
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    text: '<i class="bi bi-file-earmark-excel"></i> Exportar a Excel',
+                    title: 'Listado de Productos',
+                    className: 'btn btn-success',
+                    exportOptions: {
+                        columns: [0, 2, 3, 4, 5, 6, 7, 8, 9],
+                        modifier: {
+                            page: 'all'
+                        }
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    text: '<i class="bi bi-file-earmark-pdf"></i> Exportar a PDF',
+                    title: 'Listado de Productos',
+                    className: 'btn btn-danger',
+                    orientation: 'landscape',
+                    pageSize: 'A4',
+                    exportOptions: {
+                        columns: [0, 2, 3, 4, 5, 6, 7, 8, 9],
+                        modifier: {
+                            page: 'all'
+                        }
+                    }
+                },
+                {
+                    extend: 'print',
+                    text: '<i class="bi bi-printer"></i> Imprimir',
+                    className: 'btn btn-info',
+                    orientation: 'landscape',
+                    pageSize: 'A4',
+                    exportOptions: {
+                        columns: [0, 2, 3, 4, 5, 6, 7, 8, 9],
+                        modifier: {
+                            page: 'all'
+                        }
+                    },
+                    customize: function (win) {
+                        $(win.document.body)
+                            .css('font-size', '10pt')
+                            .prepend('<h3 style="text-align:center;">Listado de Productos</h3>');
+                    }
+                }
+            ]
         });
     }
 
@@ -176,39 +223,39 @@ $(document).ready(function () {
             method: "POST",
             body: formData
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showNotification(data.message, "success");
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message, "success");
 
-                // Ocultar el modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById("productoModal"));
-                modal.hide();
+                    // Ocultar el modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById("productoModal"));
+                    modal.hide();
 
-                // Limpiar formulario e imagen preview
-                form.reset();
-                document.getElementById("imagenPreview").src = "https://via.placeholder.com/150";
+                    // Limpiar formulario e imagen preview
+                    form.reset();
+                    document.getElementById("imagenPreview").src = "https://via.placeholder.com/150";
 
-                // Recargar DataTable
-                if (dataTable) {
-                    dataTable.ajax.reload(null, false); // false para no reiniciar la paginación
+                    // Recargar DataTable
+                    if (dataTable) {
+                        dataTable.ajax.reload(null, false); // false para no reiniciar la paginación
+                    }
+                } else {
+                    showNotification(data.message, "error");
                 }
-            } else {
-                showNotification(data.message, "error");
-            }
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            showNotification("Error al guardar el producto", "error");
-        });
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                showNotification("Error al guardar el producto", "error");
+            });
     }
 
     // Previsualización de la imagen antes de subir
-    document.getElementById("imagen").addEventListener("change", function(event) {
+    document.getElementById("imagen").addEventListener("change", function (event) {
         const file = event.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 document.getElementById("imagenPreview").src = e.target.result;
             };
             reader.readAsDataURL(file);
@@ -458,11 +505,11 @@ $(document).ready(function () {
     }
 
     function showFieldError(fieldName, message) {
-            const field = $(`#${fieldName}`);
-            const errorDiv = $(`#${fieldName}-error`);
+        const field = $(`#${fieldName}`);
+        const errorDiv = $(`#${fieldName}-error`);
 
-            field.addClass('is-invalid');
-            errorDiv.text(message);
+        field.addClass('is-invalid');
+        errorDiv.text(message);
     }
 
 });

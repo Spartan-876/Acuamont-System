@@ -71,7 +71,7 @@ $(document).ready(function() {
                 { responsivePriority: 2, targets: 6 }, // Acciones
             ],
             language: {
-                url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json',
+                url: 'https://cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json',
             },
             pageLength: 10
         });
