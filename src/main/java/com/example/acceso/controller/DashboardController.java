@@ -5,11 +5,13 @@ package com.example.acceso.controller;
 import com.example.acceso.service.CategoriaService;
 import com.example.acceso.service.ProductoService;
 import com.example.acceso.service.UsuarioService;
+import com.example.acceso.service.VentaService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,13 +28,15 @@ public class DashboardController {
     private final UsuarioService usuarioService;
     private final ProductoService productoService;
     private final CategoriaService categoriaService;
+    private final VentaService ventaService;
 
     // Constructor para la inyección de dependencias. Spring automáticamente
     // proporcionará una instancia de UsuarioService.
-    public DashboardController(UsuarioService usuarioService, ProductoService productoService, CategoriaService categoriaService) {
+    public DashboardController(UsuarioService usuarioService, ProductoService productoService, CategoriaService categoriaService, VentaService ventaService) {
         this.usuarioService = usuarioService;
         this.productoService = productoService;
         this.categoriaService = categoriaService;
+        this.ventaService = ventaService;
     }
 
     // @GetMapping("/"): Asocia este método a las peticiones HTTP GET para la URL
@@ -45,6 +49,9 @@ public class DashboardController {
         long totalUsuarios = usuarioService.contarUsuarios();
         long totalProductos = productoService.contarProductos();
         long totalCategorias = categoriaService.contarCategorias();
+        BigDecimal totalVentasDia = ventaService.totalVentasDelDia();
+        BigDecimal totalVentasMes = ventaService.totalVentasDelMes();
+        BigDecimal totalDeuda = ventaService.totalDeuda();
 
         // 2. 'model' es un objeto que permite pasar datos desde el controlador a la
         // vista (HTML).
@@ -54,6 +61,12 @@ public class DashboardController {
         model.addAttribute("totalCategorias",totalCategorias);
 
         model.addAttribute("totalProductos",totalProductos);
+
+        model.addAttribute("totalVentasDia",totalVentasDia);
+
+        model.addAttribute("totalVentasMes",totalVentasMes);
+
+        model.addAttribute("totalDeuda",totalDeuda);
 
         // 3. Devuelve el nombre de la vista (el archivo HTML) que se debe renderizar.
         // Spring Boot buscará un archivo llamado "index.html" en la carpeta

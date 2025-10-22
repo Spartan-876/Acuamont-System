@@ -71,7 +71,6 @@
 
         .card {
             border-radius: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
             border: none;
         }
 
@@ -103,113 +102,122 @@
 
         <main class="container-fluid p-4">
             <div class="row g-4">
-                <div class="card shadow-sm mt-4 rounded-lg">
+                <div class="card shadow mt-4 rounded-lg">
                     <div class="card-body">
-                        <h2 class="card-title h4 fw-bold">¡Bienvenido a la aplicación Acceso!</h2>
-                        <p class="card-text text-muted">Usa el menú de la izquierda o las tarjetas de acceso rápido para navegar por el sistema.</p>
+                        <h2 class="card-title h4 fw-bold">Información General</h2>
                     </div>
                 </div>
 
                 <!-- Total de Usuarios -->
-                <div class="col-sm-6 col-lg-4">
-                    <div class="card text-white bg-primary shadow-sm h-100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h5 class="card-title fw-semibold">Total de Usuarios</h5>
-                                    <h2 class="display-4 fw-bold" th:text="${totalUsuarios}">0</h2>
-                                </div>
-                                <div class="card-icon text-white">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-people-fill" viewBox="0 0 16 16"><path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/></svg>
-                                </div>
-                            </div>
-                            <a th:href="@{/usuarios/listar}" class="text-white d-block mt-3 opacity-75 text-decoration-none">
-                                Ver detalles &rarr;
-                            </a>
+                <div class="col-12 col-md-4 col-lg-3">
+                    <div class="card shadow-sm border-start border-4 border-primary d-flex flex-row align-items-center p-3 h-100">
+                        <div class="text-primary me-3">
+                            <i class="bi bi-people-fill" style="font-size: 2rem;"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1 fw-semibold text-uppercase small">Total de Usuarios</h6>
+                            <h4 class="fw-bold mb-0" th:text="${totalUsuarios}">0</h4>
+                            <a th:href="@{/usuarios/listar}" class="text-primary small text-decoration-none">Ver detalles →</a>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-sm-6 col-lg-4">
-                    <div class="card text-white bg-warning shadow-sm h-100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h5 class="card-title fw-semibold">Total de Categorias</h5>
-                                    <h2 class="display-4 fw-bold" th:text="${totalCategorias}">0</h2>
-                                </div>
-                                <div class="card-icon text-white">
-                                    <i class="bi bi-card-checklist"></i>
-                                </div>
-                            </div>
-                            <a th:href="@{/categorias/listar}" class="text-white d-block mt-3 opacity-75 text-decoration-none">
-                                Ver detalles &rarr;
-                            </a>
+                <!-- Total de Categorías -->
+                <div class="col-12 col-md-4 col-lg-3">
+                    <div class="card shadow-sm border-start border-4 border-warning d-flex flex-row align-items-center p-3 h-100">
+                        <div class="text-warning me-3">
+                            <i class="bi bi-card-checklist" style="font-size: 2rem;"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1 fw-semibold text-uppercase small">Total de Categorías</h6>
+                            <h4 class="fw-bold mb-0" th:text="${totalCategorias}">0</h4>
+                            <a th:href="@{/categorias/listar}" class="text-warning small text-decoration-none">Ver detalles →</a>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-sm-6 col-lg-4">
-                    <div class="card text-white bg-danger shadow-sm h-100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h5 class="card-title fw-semibold">Total de Productos</h5>
-                                    <h2 class="display-4 fw-bold" th:text="${totalProductos}">0</h2>
-                                </div>
-                                <div class="card-icon text-white">
-                                    <i class="bi bi-box"></i>
-                                </div>
-                            </div>
-                            <a th:href="@{/productos/listar}" class="text-white d-block mt-3 opacity-75 text-decoration-none">
-                                Ver detalles &rarr;
-                            </a>
+                <!-- Total de Productos -->
+                <div class="col-12 col-md-4 col-lg-3">
+                    <div class="card shadow-sm border-start border-4 border-danger d-flex flex-row align-items-center p-3 h-100">
+                        <div class="text-danger me-3">
+                            <i class="bi bi-box" style="font-size: 2rem;"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1 fw-semibold text-uppercase small">Total de Productos</h6>
+                            <h4 class="fw-bold mb-0" th:text="${totalProductos}">0</h4>
+                            <a th:href="@{/productos/listar}" class="text-danger small text-decoration-none">Ver detalles →</a>
                         </div>
                     </div>
                 </div>
 
-
-                <!-- Nuevo Usuario -->
-                <div class="col-sm-6 col-lg-4">
-                    <div class="card text-white bg-success shadow-sm h-100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h5 class="card-title fw-semibold">Nuevo Usuario</h5>
-                                    <p class="card-text text-white opacity-75">Añadir un nuevo registro.</p>
-                                </div>
-                                <div class="card-icon text-white">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16"><path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/><path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13.5z"/></svg>
-                                </div>
-                            </div>
-                            <a th:href="@{/usuarios/listar}" class="text-white d-block mt-3 opacity-75 text-decoration-none">
-                                Ir al formulario &rarr;
-                            </a>
+                <!-- Total de Productos -->
+                <div class="col-12 col-md-4 col-lg-3">
+                    <div class="card shadow-sm border-start border-4 border-info d-flex flex-row align-items-center p-3 h-100">
+                        <div class="text-info me-3">
+                            <i class="bi bi-box" style="font-size: 2rem;"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1 fw-semibold text-uppercase small">Catalogo</h6>
+                            <h4 class="fw-bold mb-0">Ver Catalogo</h4>
+                            <a th:href="@{/Productos-web}" class="text-info small text-decoration-none">Ver detalles →</a>
                         </div>
                     </div>
                 </div>
 
-                <!-- Reportes -->
-                <div class="col-sm-6 col-lg-4">
-                    <div class="card text-white bg-warning shadow-sm h-100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h5 class="card-title fw-semibold">Reportes</h5>
-                                    <p class="card-text text-black-50">Visualizar y exportar datos.</p>
-                                </div>
-                                <div class="card-icon text-white">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-bar-chart-fill" viewBox="0 0 16 16"><path d="M1 11a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1z"/></svg>
-                                </div>
-                            </div>
-                            <a href="#" class="text-black-50 d-block mt-3 opacity-75 text-decoration-none">
-                                Próximamente...
-                            </a>
-                        </div>
-                    </div>
-                </div>
             </div>
+        </main>
 
+        <main class="container-fluid p-4">
+            <div class="row g-4">
+                <div class="card shadow mt-4 rounded-lg">
+                    <div class="card-body">
+                        <h2 class="card-title h4 fw-bold">Información de Ventas</h2>
+                    </div>
+                </div>
+
+                <!-- Total Ventas del Día -->
+                <div class="col-12 col-md-4 col-lg-4">
+                    <div class="card shadow-sm border-start border-4 border-success d-flex flex-row align-items-center p-3 h-100">
+                        <div class="text-success me-3">
+                            <i class="bi bi-cash-stack" style="font-size: 2rem;"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1 fw-semibold text-uppercase small">Total Ventas del Día</h6>
+                            <h4 class="fw-bold mb-0 text-success" th:text="${totalVentasDia}">0</h4>
+                            <a th:href="@{/ventas/listar}" class="text-success small text-decoration-none">Ver detalles →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Ventas del Mes -->
+                <div class="col-12 col-md-4 col-lg-4">
+                    <div class="card shadow-sm border-start border-4 border-warning d-flex flex-row align-items-center p-3 h-100">
+                        <div class="text-warning me-3">
+                            <i class="bi bi-bar-chart-fill" style="font-size: 2rem;"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1 fw-semibold text-uppercase small">Total Ventas del Mes</h6>
+                            <h4 class="fw-bold mb-0 text-warning" th:text="${totalVentasMes}">0</h4>
+                            <a th:href="@{/ventas/listar}" class="text-warning small text-decoration-none">Ver detalles →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Deudas por Cobrar -->
+                <div class="col-12 col-md-4 col-lg-4">
+                    <div class="card shadow-sm border-start border-4 border-danger d-flex flex-row align-items-center p-3 h-100">
+                        <div class="text-danger me-3">
+                            <i class="bi bi-wallet2" style="font-size: 2rem;"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1 fw-semibold text-uppercase small">Total Deudas por Cobrar</h6>
+                            <h4 class="fw-bold mb-0 text-danger" th:text="${totalDeuda}">0</h4>
+                            <a th:href="@{/ventas/listar}" class="text-danger small text-decoration-none">Ver detalles →</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </main>
     </div>
 </div>

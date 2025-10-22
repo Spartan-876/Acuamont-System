@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -231,4 +232,48 @@ public class VentaService {
         return pagoRepository.findPagosByVentaId(ventaId);
     }
 
+    @Transactional(readOnly = true)
+    public BigDecimal totalVentasDelDia() {
+           List<Venta> ventas = ventaRepository.findAllByEstadoNot(2);
+           if (ventas.isEmpty()) {
+               return BigDecimal.ZERO;
+           }
+           BigDecimal total = BigDecimal.ZERO;
+           for (Venta venta : ventas) {
+               if (venta.getFecha().toLocalDate().isEqual(LocalDate.now())) {
+                   total = total.add(venta.getTotal());
+               }
+           }
+           return total;
+    }
+
+    @Transactional(readOnly = true)
+    public BigDecimal totalVentasDelMes() {
+           List<Venta> ventas = ventaRepository.findAllByEstadoNot(2);
+           if (ventas.isEmpty()) {
+               return BigDecimal.ZERO;
+           }
+           BigDecimal total = BigDecimal.ZERO;
+           for (Venta venta : ventas) {
+               if (venta.getFecha().toLocalDate().getMonth().equals(LocalDate.now().getMonth())) {
+                   total = total.add(venta.getTotal());
+               }
+           }
+           return total;
+    }
+
+    @Transactional(readOnly = true)
+    public BigDecimal totalDeuda() {
+        List<Venta> ventas = ventaRepository.findAllByEstadoNot(2);
+        if (ventas.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal total = BigDecimal.ZERO;
+        for (Venta venta : ventas) {
+            total = total.add(venta.getDeuda());
+        }
+        return total;
+    }
+
+    
 }
