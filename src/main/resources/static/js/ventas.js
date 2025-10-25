@@ -213,6 +213,25 @@ $(document).ready(function () {
             }
         });
 
+        $(document).on('change', '#numero_cuotas, #fecha_inicio_credito, #intervalo_pago', generarInputsFechasCuotas);
+
+        $(document).on('change', '.fecha-cuota', function () {
+            const index = parseInt($(this).data('cuota-index'));
+            const currentValue = $(this).val();
+            const nextInput = $(`#fecha_cuota_${index + 1}`);
+
+            if (nextInput.length) {
+                let minDate = new Date(currentValue + 'T00:00:00');
+                minDate.setDate(minDate.getDate() + 1);
+                const minDateISO = minDate.toISOString().split('T')[0];
+                nextInput.attr('min', minDateISO);
+
+                if (nextInput.val() < minDateISO) {
+                    nextInput.val(minDateISO);
+                }
+            }
+        });
+
         // Evento para búsqueda de cliente por documento
         $('#btnBuscarCliente').on('click', buscarClientePorDocumento);
 
@@ -450,23 +469,59 @@ $(document).ready(function () {
     }
 
     function generarPlanDeCuotas(montoDeuda) {
-        const numeroCuotas = parseInt($('#numero_cuotas').val()) || 1;
-        const fechaPrimerCuota = $('#fecha_primer_cuota').val();
-        const intervalo = parseInt($('#intervalo_pago').val()) || 30;
-
+        const numeroCuotas = parseInt($('#numero_cuotas').val()) || 0;
         const cuotas = [];
-        const montoCuota = montoDeuda / numeroCuotas;
-        let fecha = new Date(fechaPrimerCuota);
 
-        for (let i = 0; i < numeroCuotas; i++) {
+        if (numeroCuotas <= 0) {
+            return [];
+        }
+
+        const montoCuota = montoDeuda / numeroCuotas;
+
+        for (let i = 1; i <= numeroCuotas; i++) {
+            const fechaVencimiento = $(`#fecha_cuota_${i}`).val();
             cuotas.push({
                 monto: parseFloat(montoCuota.toFixed(2)),
-                fechaVencimiento: fecha.toISOString().split('T')[0]
+                fechaVencimiento: fechaVencimiento
             });
-            fecha.setDate(fecha.getDate() + intervalo);
         }
 
         return cuotas;
+    }
+
+    function generarInputsFechasCuotas() {
+        const container = $('#cuotas-fechas-container');
+        container.empty();
+
+        const numeroCuotas = parseInt($('#numero_cuotas').val()) || 0;
+        const fechaInicioCreditoStr = $('#fecha_inicio_credito').val();
+        const intervalo = parseInt($('#intervalo_pago').val()) || 30;
+
+        if (numeroCuotas <= 0 || !fechaInicioCreditoStr) {
+            return;
+        }
+
+        let fechaCalculada = new Date(fechaInicioCreditoStr + 'T00:00:00');
+        let minDate = fechaInicioCreditoStr;
+
+        for (let i = 1; i <= numeroCuotas; i++) {
+            fechaCalculada.setDate(fechaCalculada.getDate() + intervalo);
+            const fechaISO = fechaCalculada.toISOString().split('T')[0];
+
+            let d = new Date(minDate + 'T00:00:00');
+            d.setDate(d.getDate() + 1);
+            let minDateISO = d.toISOString().split('T')[0];
+
+            const inputHtml = `
+                <div class="col-md-4">
+                    <label for="fecha_cuota_${i}" class="form-label">Fecha Cuota ${i}:</label>
+                    <input type="date" id="fecha_cuota_${i}" name="fecha_cuota_${i}" class="form-control fecha-cuota" data-cuota-index="${i}" value="${fechaISO}" min="${minDateISO}">
+                    <div id="fecha_cuota_${i}-error" class="invalid-feedback d-block"></div>
+                </div>
+            `;
+            container.append(inputHtml);
+            minDate = fechaISO;
+        }
     }
 
     function validateForm(formData) {
@@ -490,7 +545,7 @@ $(document).ready(function () {
         if (formData.formaPagoId === '2') {
             const montoInicial = parseFloat($('#monto_inicial').val()) || 0;
             const numeroCuotas = parseInt($('#numero_cuotas').val()) || 0;
-            const fechaCuota = $('#fecha_primer_cuota').val();
+            const fechaInicioCredito = $('#fecha_inicio_credito').val();
             const totalVenta = productosSeleccionados.reduce((sum, producto) => sum + producto.subtotal, 0);
 
             if (montoInicial < 0) {
@@ -508,20 +563,37 @@ $(document).ready(function () {
                 hasErrors = true;
             }
 
-            if (!fechaCuota) {
-                showFieldError('fecha_primer_cuota', 'La fecha de la primera cuota es obligatoria.');
+            if (!fechaInicioCredito) {
+                showFieldError('fecha_inicio_credito', 'La fecha de inicio del crédito es obligatoria.');
                 hasErrors = true;
             }
 
             const hoy = new Date();
             hoy.setHours(0, 0, 0, 0);
-            if (new Date(fechaCuota) < hoy) {
-                showFieldError('fecha_primer_cuota', 'La fecha de la cuota no puede ser en el pasado.');
-                hasErrors = true;
-            }
 
-            // Validar consistencia de montos (como hace tu service)
-            if (formData.planDeCuotas) {
+            // Validar consistencia de montos y fechas de cuotas
+            if (formData.planDeCuotas && formData.planDeCuotas.length > 0) {
+                let hasDateErrors = false;
+                let lastDate = new Date(fechaInicioCredito + 'T00:00:00');
+
+                formData.planDeCuotas.forEach((cuota, index) => {
+                    const fieldName = `fecha_cuota_${index + 1}`;
+                    const fechaVencimiento = new Date(cuota.fechaVencimiento + 'T00:00:00');
+
+                    if (!cuota.fechaVencimiento) {
+                        showFieldError(fieldName, 'La fecha es obligatoria.');
+                        hasDateErrors = true;
+                    } else if (fechaVencimiento <= lastDate) {
+                        showFieldError(fieldName, `La fecha debe ser posterior a la fecha anterior.`);
+                        hasDateErrors = true;
+                    }
+                    lastDate = fechaVencimiento;
+                });
+
+                if (hasDateErrors) {
+                    hasErrors = true;
+                }
+
                 const sumaCuotas = formData.planDeCuotas.reduce((sum, cuota) => sum + cuota.monto, 0);
                 const totalPagado = montoInicial + sumaCuotas;
 
@@ -532,6 +604,9 @@ $(document).ready(function () {
                     );
                     hasErrors = true;
                 }
+            } else if (numeroCuotas > 0) {
+                showNotification('No se generaron las fechas de las cuotas. Verifique los datos de crédito.', 'error');
+                hasErrors = true;
             }
         }
 
@@ -587,7 +662,6 @@ $(document).ready(function () {
         $('#nombreCliente').val(venta.cliente.nombre);
         clienteSeleccionadoId = venta.cliente.id;
         $('#serie_comprobante').val(venta.serieComprobante.id);
-        $('#forma_pago').val(venta.formaPago.id);
 
         productosSeleccionados = venta.detalleVentas.map(detalle => ({
             id: detalle.producto.id,
@@ -598,13 +672,29 @@ $(document).ready(function () {
             stockDisponible: (detalle.producto.stock + detalle.cantidad)
         }));
 
-        if (venta.formaPago.id === 2) {
+        $('#forma_pago').val(venta.formaPago.id);
+        $('#forma_pago').trigger('change');
+
+        if (String(venta.formaPago.id) === '2') {
             $('#monto_inicial').val(venta.montoInicial || 0);
-            $('#numero_cuotas').val(venta.cuotas ? venta.cuotas.length : 1);
             if (venta.cuotas && venta.cuotas.length > 0) {
-                $('#fecha_primer_cuota').val(new Date(venta.cuotas[0].fechaVencimiento).toISOString().split('T')[0]);
+                $('#numero_cuotas').val(venta.cuotas.length);
+
+                const firstDueDate = new Date(venta.cuotas[0].fechaVencimiento + 'T00:00:00');
+                const intervalo = 30; 
+                const startDate = new Date(firstDueDate.setDate(firstDueDate.getDate() - intervalo));
+                $('#fecha_inicio_credito').val(startDate.toISOString().split('T')[0]);
+
+                generarInputsFechasCuotas();
+
+                venta.cuotas.forEach((cuota, index) => {
+                    const cuotaIndex = index + 1;
+                    const dueDate = new Date(cuota.fechaVencimiento + 'T00:00:00');
+                    $(`#fecha_cuota_${cuotaIndex}`).val(dueDate.toISOString().split('T')[0]);
+                });
+            } else {
+                $('#numero_cuotas').val(1);
             }
-            showContentCredito();
         }
 
         actualizarTablaProductosSeleccionados();
@@ -1174,28 +1264,37 @@ $(document).ready(function () {
                 </div>
                 <div class="col-md-4">
                     <label for="numero_cuotas" class="form-label">N° Cuotas:</label>
-                    <input type="number" id="numero_cuotas" name="numero_cuotas" class="form-control" min="1">
+                    <input type="number" id="numero_cuotas" name="numero_cuotas" class="form-control" min="1" value="1">
                     <div id="numero_cuotas-error" class="invalid-feedback d-block"></div>
                 </div>
                 <div class="col-md-4">
                     <label for="intervalo_pago" class="form-label">Intervalo de pago:</label>
                     <select name="intervalo_pago" class="form-select" id="intervalo_pago">
+                        <option value="7">Semanal (7 días)</option>
                         <option value="15">Quincenal (15 días)</option>
                         <option value="30" selected>Mensual (30 días)</option>
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label for="fecha_primer_cuota" class="form-label">Fecha primera cuota:</label>
-                    <input type="date" id="fecha_primer_cuota" name="fecha_primer_cuota" class="form-control">
-                    <div id="fecha_primer_cuota-error" class="invalid-feedback d-block"></div>
+                    <label for="fecha_inicio_credito" class="form-label">Fecha Inicio Crédito:</label>
+                    <input type="date" id="fecha_inicio_credito" name="fecha_inicio_credito" class="form-control">
+                    <div id="fecha_inicio_credito-error" class="invalid-feedback d-block"></div>
                 </div>
             </div>
+            <div id="cuotas-fechas-container" class="row g-3 mt-2"></div>
         `;
         contenedorCredito.html(contenido);
 
-        // Establecer fecha mínima como hoy
-        const hoy = new Date().toISOString().split('T')[0];
-        $('#fecha_primer_cuota').attr('min', hoy);
+        const hoy = new Date();
+        const anio = hoy.getFullYear();
+        const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+        const dia = String(hoy.getDate()).padStart(2, '0');
+
+        const fechaLocalDeHoy = `${anio}-${mes}-${dia}`;
+
+        $('#fecha_inicio_credito').val(fechaLocalDeHoy);
+
+        generarInputsFechasCuotas();
     }
 
     function hideContentCredito() {
