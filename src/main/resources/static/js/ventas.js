@@ -108,11 +108,11 @@ $(document).ready(function () {
             },
             pageLength: 10,
             lengthMenu: [10, 25, 50],
-            dom: 'Bfrtip',
+            dom: 'lBfrtip',
             buttons: [
                 {
                     extend: 'excelHtml5',
-                    text: '<i class="bi bi-file-earmark-excel"></i> Exportar a Excel',
+                    text: '<i class="bi bi-file-earmark-excel mt-1"></i> Exportar a Excel',
                     title: 'Listado de Ventas',
                     className: 'btn btn-success',
                     exportOptions: {
@@ -153,6 +153,11 @@ $(document).ready(function () {
                             .css('font-size', '10pt')
                             .prepend('<h3 style="text-align:center;">Listado de Productos</h3>');
                     }
+                },
+                {
+                    extend: 'colvis',
+                    text: '<i class="bi bi-eye"></i> Mostrar/Ocultar',
+                    className: 'btn btn-secondary'
                 }
             ]
         });
@@ -161,7 +166,7 @@ $(document).ready(function () {
     function createActionButtons(row) {
         let buttons = `
             <div class="d-flex gap-1">
-                <button data-id="${row.id}" class="btn btn-sm btn-warning action-editarVenta" title="Editar Venta">
+                <button data-id="${row.id}" class="btn btn-sm btn-primary action-editarVenta" title="Editar Venta">
                     <i class="bi bi-pencil-square"></i>
                 </button>
                 <button data-id="${row.id}" class="btn btn-sm btn-danger action-eliminarVenta" title="Eliminar Venta">
@@ -435,7 +440,7 @@ $(document).ready(function () {
             total: total
         };
 
-        // Si es crédito, agregar campos adicionales CORREGIDOS 
+        // Si es crédito, agregar campos adicionales  
         if ($('#forma_pago').val() === '2') {
             const montoInicial = parseFloat($('#monto_inicial').val()) || 0;
             formData.montoInicial = montoInicial;
@@ -482,7 +487,7 @@ $(document).ready(function () {
             hasErrors = true;
         }
 
-        if (formData.formaPagoId === 2) {
+        if (formData.formaPagoId === '2') {
             const montoInicial = parseFloat($('#monto_inicial').val()) || 0;
             const numeroCuotas = parseInt($('#numero_cuotas').val()) || 0;
             const fechaCuota = $('#fecha_primer_cuota').val();
@@ -612,13 +617,13 @@ $(document).ready(function () {
         const ventaId = $(this).data('id');
 
         Swal.fire({
-            title: '¿Estás seguro?',
-            text: "Esta acción no se puede deshacer",
+            title: '¿Estas seguro?',
+            text: "¡No podras revertir esta accion!",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Sí, eliminar',
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Si, ¡eliminar!',
             cancelButtonText: 'Cancelar'
         })
             .then((result) => {
@@ -858,11 +863,12 @@ $(document).ready(function () {
         const formData = {
             cuotaId: $('#pago_cuota_id').val(),
             montoPagado: parseFloat($('#info_monto').text().replace('S/ ', '')),
-            metodoPago: $('#metodo_pago').val()
+            metodoPago: $('#metodo_pago').val(),
+            comentario: $('#comentario').val()
         };
 
         if (!formData.metodoPago) {
-            showNotification('Debe seleccionar un método de pago', 'error');
+            showFieldError('metodo_pago', 'Seleccione un método de pago.');
             return;
         }
 

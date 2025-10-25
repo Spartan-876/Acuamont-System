@@ -99,7 +99,8 @@ $(document).ready(function () {
                 url: 'https://cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
             },
             pageLength: 10,
-            dom: 'Bfrtip',
+            lengthMenu: [10, 25, 50],
+            dom: 'lBfrtip',
             buttons: [
                 {
                     extend: 'excelHtml5',
@@ -144,6 +145,11 @@ $(document).ready(function () {
                             .css('font-size', '10pt')
                             .prepend('<h3 style="text-align:center;">Listado de Productos</h3>');
                     }
+                },
+                {
+                    extend: 'colvis',
+                    text: '<i class="bi bi-eye"></i> Mostrar/Ocultar',
+                    className: 'btn btn-secondary'
                 }
             ]
         });

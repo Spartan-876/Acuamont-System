@@ -24,8 +24,8 @@ $(document).ready(function () {
                     data: 'stock',
                     render: function (data, type, row) {
                         const badgeClass = data <= row.stockSeguridad
-                            ? 'bg-danger text-white fw-semibold px-3 py-1 rounded-pill'
-                            : 'bg-success text-white fw-semibold px-3 py-1 rounded-pill';
+                            ? ' badge bg-danger text-white fw-semibold'
+                            : ' badge bg-success text-white fw-semibold';
                         return `<span class="${badgeClass}">${data}</span>`;
                     }
                 },
@@ -56,7 +56,8 @@ $(document).ready(function () {
                 url: 'https://cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
             },
             pageLength: 10,
-            dom: 'Bfrtip',
+            lengthMenu: [10, 25, 50],
+            dom: 'lBfrtip',
             buttons: [
                 {
                     extend: 'excelHtml5',

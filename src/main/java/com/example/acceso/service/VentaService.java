@@ -200,6 +200,7 @@ public class VentaService {
         nuevoPago.setMontoPagado(pagoRequest.getMontoPagado());
         nuevoPago.setMetodoPago(pagoRequest.getMetodoPago());
         nuevoPago.setFechaPago(LocalDateTime.now());
+        nuevoPago.setComentario(pagoRequest.getComentario());
         pagoRepository.save(nuevoPago);
 
         cuota.setSaldo(cuota.getSaldo().subtract(pagoRequest.getMontoPagado()));

@@ -67,8 +67,8 @@ $(document).ready(function () {
                 url: 'https://cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
             },
             pageLength: 10,
-            lengthMenu: [5, 10, 25, 50],
-            dom: 'Bfrtip',
+            lengthMenu: [10, 25, 50],
+            dom: 'lBfrtip',
             buttons: [
                 {
                     extend: 'excelHtml5',

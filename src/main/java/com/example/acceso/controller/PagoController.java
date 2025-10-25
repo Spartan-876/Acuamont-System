@@ -22,7 +22,6 @@ public class PagoController {
 
     @PostMapping("/api/registrarPago")
     public ResponseEntity<Venta> registrarPago(@Valid @RequestBody PagosDTO pagoRequest) {
-
         Venta ventaActualizada = ventaService.registrarPago(pagoRequest);
         return ResponseEntity.ok(ventaActualizada);
     }

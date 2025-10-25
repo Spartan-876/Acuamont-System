@@ -26,16 +26,20 @@ public class Pago {
     @Column(nullable = false, length = 50)
     private String metodoPago;
 
+    @Column(nullable = false,length = 250)
+    private String comentario;
+
     @Column(nullable = false)
     private Integer estado = 1; // 1 = Activo, 0 = Inactivo
 
     public Pago() {}
 
-    public Pago(Cuota cuota, BigDecimal montoPagado, LocalDateTime fechaPago, String metodoPago) {
+    public Pago(Cuota cuota, BigDecimal montoPagado, LocalDateTime fechaPago, String metodoPago, String comentario) {
         this.cuota = cuota;
         this.montoPagado = montoPagado;
         this.fechaPago = fechaPago;
         this.metodoPago = metodoPago;
+        this.comentario = comentario;
     }
 
     public Long getId() {
@@ -72,6 +76,14 @@ public class Pago {
 
     public String getMetodoPago() {
         return metodoPago;
+    }
+
+    public String getComentario() {
+        return comentario;
+    }
+
+    public void setComentario(String comentario) {
+        this.comentario = comentario;
     }
 
     public void setMetodoPago(String metodoPago) {
