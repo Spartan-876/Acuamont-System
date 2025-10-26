@@ -170,7 +170,7 @@ $(document).ready(function () {
                     <i class="bi bi-pencil-square"></i>
                 </button>
                 <button data-id="${row.id}" class="btn btn-sm btn-danger action-eliminarVenta" title="Eliminar Venta">
-                    <i class="bi bi-trash"></i>
+                    <i class="bi bi-trash3-fill"></i>
                 </button>
         `;
 
