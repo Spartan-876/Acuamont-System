@@ -43,22 +43,6 @@ public class VentaController {
         return "ventas";
     }
 
-    @GetMapping("/api/usuarioLogueado")
-    @ResponseBody
-    public ResponseEntity<?> listarUsuariosApi(HttpSession session) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("data", usuarioService.listarUsuarios());
-
-        // Obtener usuario de sesión
-        Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
-        if (usuarioLogueado != null) {
-            response.put("usuarioActual", usuarioLogueado.getId());
-        }
-
-        return ResponseEntity.ok(response);
-    }
-
     @GetMapping("/api/listar")
     @ResponseBody
     public ResponseEntity<?> listarVentasApi() {

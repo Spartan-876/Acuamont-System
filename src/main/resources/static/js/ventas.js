@@ -8,18 +8,18 @@ $(document).ready(function () {
     let pagosModal;
     let registrarPagoModal;
     let clienteSeleccionadoId = null;
-    let ventaActualId = null;
     let productosDisponibles = [];
     let productosSeleccionados = [];
     let usuarioLogueadoId = null;
 
     // Configuración de las rutas de la API
     const API_CLIENTES = '/clientes/api';
+    const API_USUARIOS = '/usuarios/api';
     const API_PRODUCTOS = '/productos/api';
     const API_PAGOS = '/pagos/api';
     const API_BASE = '/ventas/api';
     const ENDPOINTS = {
-        usuario: `${API_BASE}/usuarioLogueado`,
+        usuario: `${API_USUARIOS}/usuarioLogueado`,
         list: `${API_BASE}/listar`,
         save: `${API_BASE}/guardar`,
         select_venta: (id) => `${API_BASE}/ventas_id/${id}`,
@@ -534,6 +534,14 @@ $(document).ready(function () {
 
         if (!formData.serieComprobanteId) {
             showFieldError('serie_comprobante', 'La serie del comprobante es obligatoria.');
+            hasErrors = true;
+        }
+
+        const serieText = $('#serie_comprobante option:selected').text().toLowerCase();
+        const documento = $('#documento').val().trim();
+
+        if (serieText.includes('factura') && documento.length !== 11) {
+            showFieldError('documento', 'Para Factura, el Documento debe tener 11 dígitos.');
             hasErrors = true;
         }
 

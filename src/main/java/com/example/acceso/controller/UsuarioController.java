@@ -3,6 +3,7 @@ package com.example.acceso.controller;
 import com.example.acceso.model.Usuario;
 import com.example.acceso.service.PerfilService;
 import com.example.acceso.service.UsuarioService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
@@ -52,6 +53,22 @@ public class UsuarioController {
         List<Usuario> usuarios = usuarioService.listarUsuarios();
         response.put("success", true);
         response.put("data", usuarios);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/api/usuarioLogueado")
+    @ResponseBody
+    public ResponseEntity<?> usuarioLogueado(HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("data", usuarioService.listarUsuarios());
+
+        // Obtener usuario de sesión
+        Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuarioLogueado != null) {
+            response.put("usuarioActual", usuarioLogueado.getId());
+        }
+
         return ResponseEntity.ok(response);
     }
 
