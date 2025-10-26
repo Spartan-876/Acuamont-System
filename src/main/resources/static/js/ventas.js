@@ -687,11 +687,8 @@ $(document).ready(function () {
             $('#monto_inicial').val(venta.montoInicial || 0);
             if (venta.cuotas && venta.cuotas.length > 0) {
                 $('#numero_cuotas').val(venta.cuotas.length);
-
-                const firstDueDate = new Date(venta.cuotas[0].fechaVencimiento + 'T00:00:00');
-                const intervalo = 30; 
-                const startDate = new Date(firstDueDate.setDate(firstDueDate.getDate() - intervalo));
-                $('#fecha_inicio_credito').val(startDate.toISOString().split('T')[0]);
+                const ventaDate = new Date(venta.fecha);
+                $('#fecha_inicio_credito').val(ventaDate.toISOString().split('T')[0]);
 
                 generarInputsFechasCuotas();
 

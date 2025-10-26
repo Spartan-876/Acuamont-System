@@ -45,10 +45,10 @@
                         <h3 class="fw-bold border-bottom border-3 border-black">Redes Sociales</h3>
                         <div class="col mt-3">
                             <div th:each="red : ${redesSocialesActivas}" class="row border-0 rounded my-3">
-                                <a class="btn text-white ms-5 w-auto shadow" style="background-color: #061748"
-                                    th:href="${red.url}"
-                                    target="_blank"
-                                    rel="noopener noreferrer">
+                                <a class="btn bg-secondary text-white ms-5 w-auto shadow"
+                                   th:href="${red.url}"
+                                   target="_blank"
+                                   rel="noopener noreferrer">
 
                                     <i th:class="${red.icono}"></i>
                                     <span th:text="${red.nombre}"></span>
