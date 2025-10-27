@@ -1,9 +1,7 @@
 package com.example.acceso.service;
 
-import com.example.acceso.model.DetalleVenta;
 import com.example.acceso.model.TipoMovimiento;
 import com.example.acceso.model.Venta;
-import com.example.acceso.repository.DetalleVentaRepository;
 import com.example.acceso.repository.TipoMovimeintoRepository;
 import com.example.acceso.repository.VentaRepository;
 import org.springframework.stereotype.Service;
@@ -28,6 +26,5 @@ public class InventarioService {
     public List<TipoMovimiento> listarTiposMovimientos() {
         return tipoMovimeintoRepository.findAllByEstadoNot(2);
     }
-
 
 }
