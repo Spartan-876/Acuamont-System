@@ -17,7 +17,7 @@ $(document).ready(function () {
 
     function initializeDataTable() {
         dataTable = tablaRedes.DataTable({
-            responsive: true,
+            responsive: false,
             processing: true,
             ajax: {
                 url: ENDPOINTS.listar,
@@ -66,7 +66,8 @@ $(document).ready(function () {
             lengthChange: false,
             pageLength: 5,
             searching: false,
-            info: false
+            info: false,
+            paging: false,
         });
     }
 

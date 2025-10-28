@@ -38,7 +38,7 @@ $(document).ready(function () {
                 { data: 'id' },
                 {
                     data: 'imagen', render: function (data, type, row) {
-                        return `<img src="/Fotos-Productos/${data}" class=" w-100 h-100 img-fluid">`;
+                        return `<img src="/Fotos-Productos/${data}" class="rounded-3 w-100 h-100 img-fluid">`;
                     }
                 },
                 { data: 'nombre' },

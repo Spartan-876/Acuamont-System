@@ -28,7 +28,8 @@ $(document).ready(function () {
     $(document).on('click', '.btn-agregar', function (e) {
         e.preventDefault();
         const idProducto = $(this).data('id');
-        agregarProducto(idProducto);
+        const cantidad = parseInt($('#cantidad-producto').val()) || 1;
+        agregarProducto(idProducto, cantidad);
     });
 
     $(document).on('click', '#btnVaciarCarrito', function () {
@@ -63,9 +64,11 @@ $(document).ready(function () {
         }
 
         productos.forEach(prod => {
+            const isAgotado = prod.stock === 0;
             const productoCard = `
-            <div class="col-12 col-sm-6 col-lg-3 my-4">
-                <div class="card h-100 card-rounded border-0 shadow overflow-hidden">
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card h-100 card-rounded border-0 shadow overflow-hidden ${isAgotado ? 'agotado-card' : ''}">
+                    ${isAgotado ? '<span class="badge bg-danger text-white position-absolute top-50 start-50 translate-middle fs-5 z-1">Agotado</span>' : ''}
                     <div class="ratio ratio-4x3">
                     <img src="/Fotos-Productos/${prod.imagen}" 
                         class="card-img-top img-fluid object-fit-cover"
@@ -75,8 +78,8 @@ $(document).ready(function () {
                         <h5 class="card-title fw-bold">${prod.nombre}</h5>
                         <p class="card-text text-secondary flex-grow-1 w-auto fw-bold">S/ ${prod.precioVenta.toFixed(2)}</p>
                         <a href="#"
-                            class="btn btn-primary btn-sm btn-rounded mt-auto align-self-start m-auto btn-detalles"
-                            data-id="${prod.id}">
+                            class="btn text-white btn-sm btn-rounded mt-auto align-self-start m-auto btn-detalles"
+                            data-id="${prod.id}" style="background-color:#061748">
                             Ver Detalles
                         </a>
                     </div>
@@ -85,13 +88,13 @@ $(document).ready(function () {
         `;
             contenedor.innerHTML += productoCard;
         });
-
     }
 
     function showModalDetalles(idProducto) {
         const producto = productos.find(p => p.id == idProducto);
 
         if (producto) {
+            const isAgotado = producto.stock === 0;
             const modalHtml = `
                 <div class="modal fade" id="modal-Detalles" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -126,9 +129,15 @@ $(document).ready(function () {
 
                                         </div>
 
+                                        <!-- Cantidad -->
+                                        <div class="d-flex align-items-center mb-3">
+                                            <label for="cantidad-producto" class="form-label me-3 mb-0">Cantidad:</label>
+                                            <input type="number" id="cantidad-producto" class="form-control w-25" value="1" min="1" max="${producto.stock}" ${isAgotado ? 'disabled' : ''}>
+                                        </div>
+
                                         <!-- Botones -->
                                         <div class="d-grid gap-2">
-                                            <button class="btn btn-primary btn-lg btn-agregar" data-id="${producto.id}">
+                                            <button class="btn btn-primary btn-lg btn-agregar" data-id="${producto.id}" ${isAgotado ? 'disabled' : ''}>
                                                 <i class="bi bi-cart-plus me-2"></i>Agregar al Carrito
                                             </button>
                                             <a id="btn-whatsapp" target="_blank" class="btn btn-success btn-lg">
@@ -208,18 +217,18 @@ $(document).ready(function () {
     }
 
     //Funciones para el carrito
-    function agregarProducto(idProducto) {
+    function agregarProducto(idProducto, cantidad = 1) {
         const prod = productos.find(p => p.id === idProducto);
         const existente = carrito.find(item => item.id === idProducto);
 
         if (existente) {
-            existente.cantidad++;
+            existente.cantidad += cantidad;
         } else {
-            carrito.push({ ...prod, cantidad: 1 });
+            carrito.push({ ...prod, cantidad: cantidad });
         }
 
         showNotification(`${prod.nombre} agregado al carrito`, 'success');
-        $('#cartCount').text(carrito.reduce((acc, item) => acc + item.cantidad, 0));
+        actualizarContadorCarrito();
     }
 
 
@@ -253,7 +262,7 @@ $(document).ready(function () {
                     <tr>
                         <td>${item.nombre}</td>
                         <td>S/ ${item.precioVenta.toFixed(2)}</td>
-                        <td>${item.cantidad}</td>
+                        <td><input type="number" class="form-control cantidad-carrito" data-id="${item.id}" value="${item.cantidad}" min="1" max="${item.stock}"></td>
                         <td>S/ ${subtotal.toFixed(2)}</td>
                         <td><button class="btn btn-sm btn-danger btn-eliminar" data-id="${item.id}">
                             <i class="bi bi-trash"></i> Eliminar
@@ -275,6 +284,21 @@ $(document).ready(function () {
             const idProducto = $(this).data('id');
             eliminarProducto(idProducto);
         });
+
+        $(document).off('change', '.cantidad-carrito').on('change', '.cantidad-carrito', function () {
+            const idProducto = $(this).data('id');
+            const nuevaCantidad = parseInt($(this).val());
+            actualizarCantidad(idProducto, nuevaCantidad);
+        });
+    }
+
+    function actualizarCantidad(idProducto, cantidad) {
+        const item = carrito.find(p => p.id === idProducto);
+        if (item) {
+            item.cantidad = cantidad;
+        }
+        actualizarContadorCarrito();
+        mostrarCarrito(carrito);
     }
 
     function limpiarCarrito() {
@@ -283,19 +307,35 @@ $(document).ready(function () {
         actualizarContadorCarrito();
     }
 
+    function finalizarCompra() {
+        let mensaje = '¡Hola! Quisiera hacer el siguiente pedido:\n\n';
+        let total = 0;
+        carrito.forEach(item => {
+            let subtotal = item.precioVenta * item.cantidad;
+            mensaje += `${item.cantidad} x ${item.nombre} - S/ ${subtotal.toFixed(2)}\n`;
+            total += subtotal;
+        });
+        mensaje += `\nTotal: S/ ${total.toFixed(2)}`;
+
+        const link = `https://wa.me/51913048853?text=${encodeURIComponent(mensaje)}`;
+        window.open(link, '_blank');
+    }
+
+    $(document).on('click', '#btnFinalizarCompra', finalizarCompra);
+
     function showNotification(message, type = 'success') {
         const toastClass = type === 'success' ? 'text-bg-success' : 'text-bg-danger';
 
-        const notification = $(`
-            <div class="toast align-items-center ${toastClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        const notification = $(
+            `<div class="toast align-items-center ${toastClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="d-flex">
                     <div class="toast-body">
                         ${message}
                     </div>
                     <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
-            </div>
-        `);
+            </div>`
+        );
 
         $('#notification-container').append(notification);
 

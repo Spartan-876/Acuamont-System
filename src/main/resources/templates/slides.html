@@ -30,46 +30,54 @@
                 </div>
             </header>
 
-            <!-- Logo -->
-            <div class="card mt-4 mx-4 shadow border border-rounded-md bg-white">
-                <div class="card-header">
-                    <h1 class="h5 mb-0">Logo de la empresa</h1>
-                </div>
-                <div class="card-content p-3">
-                    <form method="post" enctype="multipart/form-data" th:action="@{/logo/guardar}"
-                        class="d-flex align-items-center">
-                        <input type="file" name="logo" class="form-control me-2" accept="image/*" required>
-                        <button type="submit" class="btn btn-primary d-flex align-items-center">
-                            <i class="bi bi-upload me-1"></i> Subir
-                        </button>
-                    </form>
-                    <div class="mt-3 text-center">
-                        <img th:src="@{/iconos/logo2.jpg}" alt="Logo actual" class="img-fluid"
-                            style="max-height: 150px; object-fit: contain;"
-                            onerror="console.error('Error cargando logo:', this.src)">
+            <div class="container-fluid px-4">
+                <div class="row">
+                    <!-- Logo -->
+                    <div class="col-lg-4 mt-4">
+                        <div class="card shadow border border-rounded-md bg-white h-100">
+                            <div class="card-header">
+                                <h1 class="h5 mb-0">Logo de la empresa</h1>
+                            </div>
+                            <div class="card-content p-3">
+                                <form method="post" enctype="multipart/form-data" th:action="@{/logo/guardar}"
+                                    class="d-flex align-items-center">
+                                    <input type="file" name="logo" class="form-control me-2" accept="image/*" required>
+                                    <button type="submit" class="btn btn-primary d-flex align-items-center">
+                                        <i class="bi bi-upload me-1"></i> Subir
+                                    </button>
+                                </form>
+                                <div class="mt-3 text-center">
+                                    <img th:src="@{/iconos/logo2.jpg}" alt="Logo actual" class="img-fluid"
+                                        style="max-height: 150px; object-fit: contain;"
+                                        onerror="console.error('Error cargando logo:', this.src)">
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Redes Sociales -->
-            <div class="card mt-4 mx-4 shadow border border-rounded-md bg-white">
-                <div class="card-header">
-                    <h1 class="h5 mb-0">Redes Sociales</h1>
-                </div>
-                <div class="card-content p-3">
-                    <div class="table-responsive">
-                        <table id="tabla-redes-sociales" class="table table-hover align-middle" style="width:100%">
-                            <thead class="table-light">
-                                <tr>
-                                    <th scope="col">Icono</th>
-                                    <th scope="col">Nombre</th>
-                                    <th scope="col">URL (Enlace)</th>
-                                    <th scope="col">Estado</th>
-                                    <th scope="col" class="text-end">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
+                    <!-- Redes Sociales -->
+                    <div class="col-lg-8 mt-4">
+                        <div class="card shadow border border-rounded-md bg-white h-100">
+                            <div class="card-header">
+                                <h1 class="h5 mb-0">Redes Sociales</h1>
+                            </div>
+                            <div class="card-content p-3">
+                                <table id="tabla-redes-sociales" class="table table-hover" style="width:100%">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th scope="col">Icono</th>
+                                            <th scope="col">Nombre</th>
+                                            <th scope="col">URL (Enlace)</th>
+                                            <th scope="col">Estado</th>
+                                            <th scope="col" class="text-end">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- las redes sociales serán cargadas dinámicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -103,7 +111,7 @@
             </div>
 
             <!-- Slides -->
-            <div class="card mt-4 mx-4 shadow border border-rounded-md bg-white">
+            <div class="card my-4 mx-4 shadow border border-rounded-md bg-white">
 
                 <div class="card-header">
                     <h1 class="h5 mb-0">Slides de Inicio</h1>
