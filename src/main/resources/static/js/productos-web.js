@@ -122,6 +122,8 @@ $(document).ready(function () {
                                         <div class="mb-4">
                                             <h6 class="fw-semibold text-muted mb-2 fw-bold">Descripción:</h6>
                                             <p class="text-dark">${producto.descripcion || "Producto de calidad disponible."}</p>
+                                            <p class="text-dark">Stock: ${producto.stock}</p>
+
                                         </div>
 
                                         <!-- Botones -->
