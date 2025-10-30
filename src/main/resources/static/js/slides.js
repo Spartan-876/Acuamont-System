@@ -8,7 +8,7 @@ $(document).ready(function () {
     const ENDPOINTS = {
         listar: `${API_BASE}/listar`,
         actualizar: (id) => `${API_BASE}/actualizar/${id}`,
-        cambiarEstado: (id) => `${API_BASE}/cambiarestado/${id}`
+        cambiarEstado: (id) => `${API_BASE}/cambiar-estado/${id}`
     }
 
     initializeDataTable();

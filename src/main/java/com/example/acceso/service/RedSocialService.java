@@ -9,34 +9,72 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Servicio para gestionar la lógica de negocio de las redes sociales.
+ *
+ * Proporciona métodos para listar, actualizar y cambiar el estado de las
+ * redes sociales que se muestran en el sitio web.
+ */
 @Service
 public class RedSocialService {
 
     private final RedSocialRepository redSocialRepository;
 
-
+    /**
+     * Constructor para la inyección de dependencias del repositorio de redes
+     * sociales.
+     *
+     * @param redSocialRepository El repositorio para las operaciones de base de
+     *                            datos de {@link RedSocial}.
+     */
     public RedSocialService(RedSocialRepository redSocialRepository) {
         this.redSocialRepository = redSocialRepository;
     }
 
+    /**
+     * Obtiene una lista de todas las redes sociales, sin importar su estado.
+     *
+     * @return Una lista con todos los objetos {@link RedSocial}.
+     */
     @Transactional(readOnly = true)
     public List<RedSocial> listarRedesSociales() {
         return redSocialRepository.findAll();
     }
 
+    /**
+     * Obtiene una lista de todas las redes sociales que están activas (estado = 1).
+     *
+     * @return Una lista de objetos {@link RedSocial} activos.
+     */
     @Transactional(readOnly = true)
     public List<RedSocial> listarRedesSocialesActivas() {
-        return redSocialRepository.findAllByEstadoNot(0);
+        return redSocialRepository.findAllByEstado(1);
     }
 
+    /**
+     * Actualiza la URL de una red social existente.
+     *
+     * @param id           El ID de la red social a actualizar.
+     * @param redSocialDTO El DTO que contiene la nueva URL.
+     * @return La entidad {@link RedSocial} actualizada y guardada.
+     * @throws RuntimeException si no se encuentra una red social con el ID
+     *                          proporcionado.
+     */
     @Transactional
-    public RedSocial ActualizarRedSocial(Long id,RedSocialDTO redSocial) {
+    public RedSocial actualizarRedSocial(Long id, RedSocialDTO redSocialDTO) {
         RedSocial redSocialActual = redSocialRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("Error: La red social con id: "+ id + " , no existe."));
-        redSocialActual.setUrl(redSocial.getUrl());
+                .orElseThrow(() -> new RuntimeException("Error: La red social con id: " + id + " , no existe."));
+        redSocialActual.setUrl(redSocialDTO.getUrl());
         return redSocialRepository.save(redSocialActual);
     }
 
+    /**
+     * Cambia el estado de una red social entre activo (1) e inactivo (0).
+     *
+     * @param id El ID de la red social cuyo estado se va a cambiar.
+     * @return Un {@link Optional} con la red social actualizada si se encontró, o
+     *         un Optional vacío si no.
+     */
     @Transactional
     public Optional<RedSocial> cambiarEstadoRedSocial(Long id) {
         if (id == null || id <= 0) {

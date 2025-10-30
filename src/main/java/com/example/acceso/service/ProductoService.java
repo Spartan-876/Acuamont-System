@@ -16,25 +16,64 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Servicio para gestionar la lógica de negocio de los productos.
+ *
+ * Proporciona métodos para operaciones CRUD (Crear, Leer, Actualizar, Eliminar)
+ * sobre las entidades de Producto, incluyendo la gestión de imágenes asociadas.
+ */
 @Service
 public class ProductoService {
 
+    /**
+     * Directorio donde se subirán las imágenes de los productos.
+     * Inyectado desde el archivo de propiedades (application.properties).
+     */
     @Value("${file.upload-dir}")
     private String uploadDir;
 
     private final ProductoRepository productoRepository;
 
+    /**
+     * Constructor para la inyección de dependencias del repositorio de productos.
+     *
+     * @param productoRepository El repositorio para las operaciones de base de
+     *                           datos de Producto.
+     */
     public ProductoService(ProductoRepository productoRepository) {
         this.productoRepository = productoRepository;
     }
 
+    /**
+     * Obtiene una lista de todos los productos que no están eliminados lógicamente.
+     *
+     * @return Una lista de objetos {@link Producto}.
+     */
     @Transactional(readOnly = true)
     public List<Producto> listarProductos() {
         return productoRepository.findAllByEstadoNot(2);
     }
 
+    /**
+     * Guarda o actualiza un producto en la base de datos, y maneja la subida de su
+     * imagen.
+     * <p>
+     * Si el producto tiene un ID, se actualiza. Si no, se crea uno nuevo.
+     * Si se proporciona un nuevo archivo de imagen, la imagen anterior (si existe)
+     * se elimina
+     * y la nueva se guarda.
+     *
+     * @param producto El objeto {@link Producto} a guardar.
+     * @param fotoFile El archivo de imagen ({@link MultipartFile}) del producto,
+     *                 puede ser nulo.
+     * @return El producto guardado con su ID y la ruta de la imagen actualizados.
+     * @throws IllegalArgumentException Si faltan campos obligatorios, si ya existe
+     *                                  un producto con el mismo nombre,
+     *                                  o si ocurre un error al guardar la imagen o
+     *                                  los datos.
+     */
     @Transactional
-    public Producto guardarProducto(Producto producto,  MultipartFile fotoFile) {
+    public Producto guardarProducto(Producto producto, MultipartFile fotoFile) {
         try {
             if (producto.getNombre() == null || producto.getNombre().trim().isEmpty()) {
                 throw new IllegalArgumentException("El nombre es obligatorio");
@@ -82,16 +121,28 @@ public class ProductoService {
                 throw new IllegalArgumentException("Error de integridad de datos");
             }
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new IllegalArgumentException("Error al guardar el producto: " + e.getMessage(), e);
         }
     }
 
+    /**
+     * Cuenta el número total de productos que no están eliminados.
+     *
+     * @return El número de productos activos e inactivos.
+     */
     @Transactional(readOnly = true)
     public long contarProductos() {
         return productoRepository.countByEstadoNot(2);
     }
 
+    /**
+     * Busca un producto por su ID.
+     *
+     * @param id El ID del producto a buscar.
+     * @return Un {@link Optional} que contiene el producto si se encuentra, o un
+     *         Optional vacío si no.
+     */
     @Transactional(readOnly = true)
     public Optional<Producto> obtenerProductoPorId(Long id) {
         if (id == null || id <= 0) {
@@ -100,6 +151,13 @@ public class ProductoService {
         return productoRepository.findById(id);
     }
 
+    /**
+     * Busca un producto por su nombre.
+     *
+     * @param nombre El nombre del producto a buscar.
+     * @return Un {@link Optional} que contiene el producto si se encuentra, o un
+     *         Optional vacío si no.
+     */
     @Transactional(readOnly = true)
     public Optional<Producto> obtenerProductoPorNombre(String nombre) {
         if (nombre == null || nombre.trim().isEmpty()) {
@@ -108,6 +166,14 @@ public class ProductoService {
         return productoRepository.findByNombre(nombre.trim().toLowerCase());
     }
 
+    /**
+     * Realiza el borrado lógico de un producto, cambiando su estado a 2.
+     * También elimina la imagen asociada del sistema de archivos.
+     *
+     * @param id El ID del producto a eliminar.
+     * @throws IllegalArgumentException si el ID es inválido o el producto no se
+     *                                  encuentra.
+     */
     @Transactional
     public void eliminarProducto(Long id) {
         if (id == null || id <= 0) {
@@ -122,6 +188,15 @@ public class ProductoService {
         productoRepository.save(producto);
     }
 
+    /**
+     * Cambia el estado de un producto entre activo (1) e inactivo (0).
+     * <p>
+     * Si el producto está eliminado (estado 2), no se realiza ningún cambio.
+     *
+     * @param id El ID del producto cuyo estado se va a cambiar.
+     * @return Un {@link Optional} con el producto actualizado si se encontró, o un
+     *         Optional vacío si no.
+     */
     @Transactional
     public Optional<Producto> cambiarEstadoProducto(Long id) {
         if (id == null || id <= 0) {
@@ -138,8 +213,14 @@ public class ProductoService {
         });
     }
 
-    //Control de imagenes
-
+    /**
+     * Guarda un archivo de imagen en el directorio de subidas.
+     * Genera un nombre de archivo único para evitar colisiones.
+     *
+     * @param fotoFile El archivo de imagen a guardar.
+     * @return El nombre único del archivo guardado.
+     * @throws IOException Si ocurre un error durante la escritura del archivo.
+     */
     private String guardarImagen(MultipartFile fotoFile) throws IOException {
         // Genera un nombre de archivo único para evitar colisiones
         String nombreUnico = UUID.randomUUID().toString() + "_" + fotoFile.getOriginalFilename();
@@ -151,6 +232,12 @@ public class ProductoService {
         return nombreUnico;
     }
 
+    /**
+     * Elimina un archivo de imagen del directorio de subidas.
+     *
+     * @param nombreImagen El nombre del archivo a eliminar.
+     * @throws IllegalArgumentException Si ocurre un error al eliminar el archivo.
+     */
     private void eliminarImagen(String nombreImagen) {
         if (nombreImagen == null || nombreImagen.isEmpty()) {
             return;
@@ -158,8 +245,9 @@ public class ProductoService {
         try {
             Path rutaImagen = Paths.get(uploadDir + nombreImagen);
             Files.deleteIfExists(rutaImagen);
-        }catch (IOException e) {
-            throw new IllegalArgumentException("Error al eliminar la imagen: "+ nombreImagen + " - " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Error al eliminar la imagen: " + nombreImagen + " - " + e.getMessage(),
+                    e);
         }
     }
 

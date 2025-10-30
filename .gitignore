@@ -25,3 +25,6 @@ Diagrama de Clases.puml
 
 # Ignorar el archivo de propiedades que contiene secretos
 /src/main/resources/application.properties
+
+# Ignorar archivos de respaldo del editor
+*~

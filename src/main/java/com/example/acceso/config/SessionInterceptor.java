@@ -7,36 +7,49 @@ import org.springframework.stereotype.Component;
 import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-// @Component: Marca esta clase como un componente de Spring. Esto permite que Spring
-// la detecte automáticamente y la gestione, por ejemplo, para poder inyectarla en WebConfig.
+/**
+ * Interceptor de sesiones para proteger las rutas privadas de la aplicación.
+ *
+ * Esta clase implementa {@link HandlerInterceptor} para interceptar todas las
+ * peticiones entrantes ANTES de que lleguen al controlador (preHandle).
+ *
+ * Su propósito es verificar si existe una sesión de usuario válida. Si no
+ * existe, la petición es redirigida a la página principal.
+ *
+ * @see com.example.acceso.config.WebConfig (Donde se registra este interceptor)
+ */
 @Component
 public class SessionInterceptor implements HandlerInterceptor {
 
-    // preHandle: Este método se ejecuta ANTES de que el controlador maneje una
-    // petición.
-    // Es el lugar perfecto para realizar validaciones, como comprobar si el usuario
-    // ha iniciado sesión.
+    /**
+     * Intercepta la petición antes de que sea manejada por el controlador.
+     *
+     * Verifica la existencia de una sesión y si el atributo "usuarioLogueado"
+     * está presente en esa sesión.
+     *
+     * @param request La petición HTTP entrante.
+     * @param response La respuesta HTTP (usada para redirigir si es necesario).
+     * @param handler El manejador (controlador) que se ejecutaría.
+     * @return {@code true} si la sesión es válida y la petición puede continuar
+     * hacia el controlador.
+     * {@code false} si la sesión es inválida (nula o sin atributo),
+     * en cuyo caso se redirige al usuario a "/PrincipalPage-web" y
+     * se detiene el procesamiento de la petición.
+     * @throws Exception Si ocurre un error durante el envío de la redirección.
+     */
     @Override
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
             @NonNull Object handler)
             throws Exception {
-        // request.getSession(false): Obtiene la sesión actual si existe. El 'false' es
-        // importante
-        // porque evita que se cree una nueva sesión si el usuario no tiene una.
-        HttpSession session = request.getSession(false); // No crea una nueva sesión si no existe
 
-        // Comprueba si no hay sesión o si el atributo "usuarioLogueado" no existe en la
-        // sesión.
+        HttpSession session = request.getSession(false);
+
         if (session == null || session.getAttribute("usuarioLogueado") == null) {
-            // Si el usuario no ha iniciado sesión, lo redirige a la página de login.
             response.sendRedirect("/PrincipalPage-web");
-            // Devuelve 'false' para detener el procesamiento de la petición. El controlador
-            // correspondiente a la URL solicitada no se ejecutará.
-            return false; // Detiene la ejecución de la petición
+
+            return false;
         }
-        // Si la sesión y el atributo existen, devuelve 'true' para permitir que la
-        // petición continúe
-        // hacia el controlador.
-        return true; // Continúa con la ejecución
+
+        return true;
     }
 }

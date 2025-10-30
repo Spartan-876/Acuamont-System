@@ -18,39 +18,55 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-// @Controller: Indica que esta clase es un controlador web.
-// @RequestMapping("/usuarios"): Todas las rutas de este controlador empezarán con "/usuarios".
+/**
+ * Controlador para gestionar las operaciones CRUD de los usuarios.
+ *
+ * Proporciona endpoints para la vista de gestión de usuarios y una API REST
+ * para interactuar con los datos de usuarios, incluyendo la asignación de perfiles
+ * y la configuración de la autenticación de dos factores (2FA).
+ */
 @Controller
 @RequestMapping("/usuarios")
 public class UsuarioController {
-    // Inyección del servicio de usuario.
     private final UsuarioService usuarioService;
     private final PerfilService perfilService;
     private final ServicioAutenticacionDosPasos servicio2FA;
 
-
+    /**
+     * Constructor para la inyección de dependencias de los servicios necesarios.
+     *
+     * @param usuarioService El servicio que maneja la lógica de negocio de los usuarios.
+     * @param perfilService  El servicio que maneja la lógica de negocio de los perfiles.
+     * @param servicio2FA    El servicio para manejar la lógica de la autenticación de dos factores.
+     */
     public UsuarioController(UsuarioService usuarioService, PerfilService perfilService, ServicioAutenticacionDosPasos servicio2FA) {
         this.usuarioService = usuarioService;
         this.perfilService = perfilService;
         this.servicio2FA = servicio2FA;
     }
 
-    // GET /usuarios/listar: Muestra la página HTML principal de gestión de
-    // usuarios.
+    /**
+     * Muestra la página de gestión de usuarios.
+     *
+     * Aunque el listado principal de datos se realiza a través de la API, este método
+     * prepara el modelo inicial y la estructura de la página.
+     *
+     * @param model El modelo para pasar datos a la vista.
+     * @return El nombre de la vista "usuarios".
+     */
     @GetMapping("/listar")
     public String listarUsuarios(Model model) {
-        // Aunque el listado se hace por API, este método prepara el modelo inicial
-        // y carga los datos necesarios para los modales (ej. lista de perfiles).
         List<Usuario> usuarios = usuarioService.listarUsuarios();
         model.addAttribute("usuarios", usuarios);
         model.addAttribute("formUsuario", new Usuario());
         return "usuarios";
     }
 
-    // GET /usuarios/api/listar: Endpoint de la API que devuelve la lista de
-    // usuarios en formato JSON.
-    // @ResponseBody: Indica que el valor de retorno del método debe ser el cuerpo
-    // de la respuesta, no el nombre de una vista.
+    /**
+     * Endpoint de la API para obtener todos los usuarios (excluyendo eliminados).
+     *
+     * @return Un {@link ResponseEntity} con la lista de usuarios en formato JSON.
+     */
     @GetMapping("/api/listar")
     @ResponseBody
     public ResponseEntity<?> listarUsuariosApi() {
@@ -61,6 +77,13 @@ public class UsuarioController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Endpoint de la API para obtener la lista de usuarios y el ID del usuario actualmente logueado.
+     * Útil para identificar al usuario actual en las listas del frontend.
+     *
+     * @param session La sesión HTTP actual para obtener el usuario logueado.
+     * @return Un {@link ResponseEntity} con la lista de usuarios y el ID del usuario actual.
+     */
     @GetMapping("/api/usuarioLogueado")
     @ResponseBody
     public ResponseEntity<?> usuarioLogueado(HttpSession session) {
@@ -68,7 +91,6 @@ public class UsuarioController {
         response.put("success", true);
         response.put("data", usuarioService.listarUsuarios());
 
-        // Obtener usuario de sesión
         Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
         if (usuarioLogueado != null) {
             response.put("usuarioActual", usuarioLogueado.getId());
@@ -77,8 +99,11 @@ public class UsuarioController {
         return ResponseEntity.ok(response);
     }
 
-    // GET /usuarios/api/perfiles: Endpoint para obtener la lista de perfiles
-    // activos.
+    /**
+     * Endpoint de la API para obtener todos los perfiles activos.
+     *
+     * @return Un {@link ResponseEntity} con la lista de perfiles activos.
+     */
     @GetMapping("/api/perfiles")
     @ResponseBody
     public ResponseEntity<?> listarPerfilesActivosApi() {
@@ -88,18 +113,19 @@ public class UsuarioController {
         return ResponseEntity.ok(response);
     }
 
-    // POST /usuarios/api/guardar: Endpoint para crear o actualizar un usuario.
-    // @RequestBody: Convierte el cuerpo JSON de la petición en un objeto Usuario.
-    // @Valid: Activa las validaciones definidas en el modelo Usuario (ej.
-    // @NotBlank).
+    /**
+     * Endpoint de la API para guardar o actualizar un usuario.
+     *
+     * @param usuario       El objeto {@link Usuario} a guardar, recibido y validado desde el cuerpo de la petición.
+     * @param bindingResult El resultado de la validación de los campos del usuario.
+     * @return Un {@link ResponseEntity} con el resultado de la operación.
+     */
     @PostMapping("/api/guardar")
     @ResponseBody
     public ResponseEntity<?> guardarUsuarioAjax(@Valid @RequestBody Usuario usuario, BindingResult bindingResult) {
         Map<String, Object> response = new HashMap<>();
 
-        // Si hay errores de validación (ej. un campo obligatorio está vacío).
         if (bindingResult.hasErrors()) {
-            // Recopila los errores y los devuelve en la respuesta JSON.
             Map<String, String> errores = new HashMap<>();
             bindingResult.getFieldErrors().forEach(error -> errores.put(error.getField(), error.getDefaultMessage()));
             response.put("success", false);
@@ -109,7 +135,6 @@ public class UsuarioController {
         }
 
         try {
-            // Llama al servicio para guardar el usuario.
             Usuario usuarioGuardado = usuarioService.guardarUsuario(usuario);
             response.put("success", true);
             response.put("usuario", usuarioGuardado);
@@ -117,17 +142,19 @@ public class UsuarioController {
                     usuario.getId() != null ? "Usuario actualizado correctamente" : "Usuario creado correctamente");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            // Captura cualquier excepción del servicio (ej. usuario duplicado) y la
-            // devuelve como error.
             response.put("success", false);
             response.put("message", "Error interno del servidor: " + e.getMessage());
             return ResponseEntity.internalServerError().body(response);
         }
     }
 
+    /**
+     * Endpoint de la API para obtener un usuario por su ID.
+     *
+     * @param id El ID del usuario a obtener.
+     * @return Un {@link ResponseEntity} con los datos del usuario o un estado 404 si no se encuentra.
+     */
     @GetMapping("/api/{id}")
-    // GET /usuarios/api/{id}: Devuelve los datos de un único usuario por su ID.
-    // @PathVariable: Extrae el valor del ID de la URL.
     @ResponseBody
     public ResponseEntity<?> obtenerUsuario(@PathVariable Long id) {
         try {
@@ -146,14 +173,18 @@ public class UsuarioController {
         }
     }
 
-    // DELETE /usuarios/api/eliminar/{id}: Realiza el borrado lógico de un usuario.
+    /**
+     * Endpoint de la API para realizar el borrado lógico de un usuario.
+     *
+     * @param id El ID del usuario a eliminar.
+     * @return Un {@link ResponseEntity} con el resultado de la operación.
+     */
     @DeleteMapping("/api/eliminar/{id}")
     @ResponseBody
     public ResponseEntity<?> eliminarUsuarioAjax(@PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            // Buena práctica: verificar si el usuario existe antes de intentar eliminarlo.
             if (!usuarioService.obtenerUsuarioPorId(id).isPresent()) {
                 response.put("success", false);
                 response.put("message", "Usuario no encontrado");
@@ -171,14 +202,18 @@ public class UsuarioController {
         }
     }
 
-    // POST /usuarios/api/cambiar-estado/{id}: Activa o desactiva un usuario.
+    /**
+     * Endpoint de la API para cambiar el estado (activo/inactivo) de un usuario.
+     *
+     * @param id El ID del usuario cuyo estado se va a cambiar.
+     * @return Un {@link ResponseEntity} con el usuario actualizado o un error si no se encuentra.
+     */
     @PostMapping("/api/cambiar-estado/{id}")
     @ResponseBody
     public ResponseEntity<?> cambiarEstadoUsuarioAjax(@PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            // Llama al servicio para cambiar el estado.
             return usuarioService.cambiarEstadoUsuario(id)
                     .map(usuario -> {
                         response.put("success", true);
@@ -187,7 +222,6 @@ public class UsuarioController {
                         return ResponseEntity.ok(response);
                     })
                     .orElseGet(() -> {
-                        // Si el servicio no encuentra el usuario, devuelve un error 404.
                         response.put("success", false);
                         response.put("message", "Usuario no encontrado");
                         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
@@ -199,6 +233,13 @@ public class UsuarioController {
         }
     }
 
+    /**
+     * Endpoint de la API para generar un nuevo secreto y el URI del código QR para la configuración de 2FA.
+     *
+     * @param id El ID del usuario para el cual se genera el secreto 2FA.
+     * @return Un {@link ResponseEntity} que contiene el secreto en texto plano y el URI de datos
+     *         para generar el código QR en el frontend.
+     */
     @GetMapping("/api/generar-2fa/{id}")
     @ResponseBody
     public ResponseEntity<?> generarSecreto2FA(@PathVariable Long id) {
@@ -215,18 +256,21 @@ public class UsuarioController {
         String secreto = servicio2FA.generarNuevoSecreto();
         String qrCodeUri = servicio2FA.generarUriDatosQr(secreto, usuario.getCorreo(), "AccesoApp");
 
-        // Guardamos temporalmente el secreto en la sesión para verificarlo después
-        // No lo guardamos en la BD hasta que el usuario lo confirme con un código válido.
-        // Esto es más seguro.
-        // HttpSession session
-        // session.setAttribute("secreto2FA_temp_" + id, secreto);
-
         response.put("success", true);
         response.put("secreto", secreto); // Se envía al front para mostrarlo por si no se puede escanear el QR
         response.put("qrCodeUri", qrCodeUri);
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Endpoint de la API para verificar el código 2FA y activar la funcionalidad para el usuario.
+     *
+     * Recibe el ID del usuario, el secreto generado en el paso anterior y el código de 6 dígitos
+     * ingresado por el usuario desde su aplicación de autenticación.
+     *
+     * @param payload Un mapa que debe contener "id", "codigo" y "secreto".
+     * @return Un {@link ResponseEntity} confirmando la activación o indicando un error.
+     */
     @PostMapping("/api/verificar-2fa")
     @ResponseBody
     public ResponseEntity<?> verificarYActivar2FA(@RequestBody Map<String, String> payload) {

@@ -1,7 +1,5 @@
-// Define el paquete al que pertenece la clase.
 package com.example.acceso.controller;
 
-// Importaciones de clases necesarias de otros paquetes.
 import com.example.acceso.service.CategoriaService;
 import com.example.acceso.service.ProductoService;
 import com.example.acceso.service.UsuarioService;
@@ -19,19 +17,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// @Controller: Marca esta clase como un controlador de Spring MVC, encargado de manejar peticiones web.
+/**
+ * Controlador principal para el dashboard y las páginas públicas del sitio web.
+ *
+ * Gestiona las peticiones a la página de inicio de la aplicación (dashboard)
+ * tras el inicio de sesión, y a las páginas de la parte pública como la página
+ * principal, contacto, productos y servicios.
+ */
 @Controller
 public class DashboardController {
 
-    // Declara una dependencia final al servicio de usuario. 'final' asegura que se
-    // inicialice en el constructor.
     private final UsuarioService usuarioService;
     private final ProductoService productoService;
     private final CategoriaService categoriaService;
     private final VentaService ventaService;
 
-    // Constructor para la inyección de dependencias. Spring automáticamente
-    // proporcionará una instancia de UsuarioService.
+    /**
+     * Constructor para la inyección de dependencias de los servicios necesarios.
+     *
+     * @param usuarioService   Servicio para gestionar la lógica de negocio de los usuarios.
+     * @param productoService  Servicio para gestionar la lógica de negocio de los productos.
+     * @param categoriaService Servicio para gestionar la lógica de negocio de las categorías.
+     * @param ventaService     Servicio para gestionar la lógica de negocio de las ventas.
+     */
     public DashboardController(UsuarioService usuarioService, ProductoService productoService, CategoriaService categoriaService, VentaService ventaService) {
         this.usuarioService = usuarioService;
         this.productoService = productoService;
@@ -39,13 +47,17 @@ public class DashboardController {
         this.ventaService = ventaService;
     }
 
-    // @GetMapping("/"): Asocia este método a las peticiones HTTP GET para la URL
-    // raíz ("/").
-    // Es la página principal que se muestra después de iniciar sesión.
+    /**
+     * Muestra el dashboard principal de la aplicación después del inicio de sesión.
+     *
+     * Recopila estadísticas clave como el total de usuarios, productos, categorías,
+     * ventas del día, ventas del mes y deudas totales, y las pasa a la vista.
+     *
+     * @param model El modelo para pasar datos a la vista.
+     * @return El nombre de la vista "index" que corresponde al dashboard.
+     */
     @GetMapping("/")
     public String mostrarDashboard(Model model) {
-        // 1. Llama al método contarUsuarios() del servicio para obtener el número total
-        // de usuarios activos e inactivos (excluyendo los eliminados).
         long totalUsuarios = usuarioService.contarUsuarios();
         long totalProductos = productoService.contarProductos();
         long totalCategorias = categoriaService.contarCategorias();
@@ -53,9 +65,6 @@ public class DashboardController {
         BigDecimal totalVentasMes = ventaService.totalVentasDelMes();
         BigDecimal totalDeuda = ventaService.totalDeuda();
 
-        // 2. 'model' es un objeto que permite pasar datos desde el controlador a la
-        // vista (HTML).
-        // Aquí, añadimos el conteo de usuarios al modelo con el nombre "totalUsuarios".
         model.addAttribute("totalUsuarios", totalUsuarios);
 
         model.addAttribute("totalCategorias",totalCategorias);
@@ -68,14 +77,20 @@ public class DashboardController {
 
         model.addAttribute("totalDeuda",totalDeuda);
 
-        // 3. Devuelve el nombre de la vista (el archivo HTML) que se debe renderizar.
-        // Spring Boot buscará un archivo llamado "index.html" en la carpeta
-        // 'src/main/resources/templates'.
         return "index";
     }
 
     private final Path slidePath = Paths.get("slide-Inicio/");
 
+    /**
+     * Muestra la página principal pública del sitio web.
+     *
+     * Carga la lista de imágenes para el carrusel (slides) y las pasa a la vista.
+     *
+     * @param model El modelo para pasar datos a la vista.
+     * @return El nombre de la vista "PrincipalPage-WEB".
+     * @throws IOException Si ocurre un error al leer el directorio de slides.
+     */
     @GetMapping("/PrincipalPage-web")
     public String principalPage(Model model) throws IOException {
 
@@ -93,16 +108,31 @@ public class DashboardController {
         return "PrincipalPage-WEB";
     }
 
+    /**
+     * Muestra la página pública de "Contacto".
+     *
+     * @return El nombre de la vista "Contacto-WEB".
+     */
     @GetMapping("/Contacto-web")
     public String mostrarPaginaContacto() {
         return "Contacto-WEB";
     }
 
+    /**
+     * Muestra la página pública de "Productos".
+     *
+     * @return El nombre de la vista "Productos-WEB".
+     */
     @GetMapping("/Productos-web")
     public String mostrarPaginaProductos() {
         return "Productos-WEB";
     }
 
+    /**
+     * Muestra la página pública de "Servicios".
+     *
+     * @return El nombre de la vista "Servicios-WEB".
+     */
     @GetMapping("/Servicios-web")
     public String mostrarPaginaServicios() {
         return "Servicios-WEB";

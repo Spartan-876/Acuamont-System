@@ -16,6 +16,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Controlador para gestionar las operaciones de ventas.
+ *
+ * Proporciona endpoints para la vista de gestión de ventas y una API REST
+ * para crear, listar, actualizar, anular y consultar ventas, así como
+ * sus datos relacionados como cuotas y pagos.
+ */
 @Controller
 @RequestMapping("/ventas")
 public class VentaController {
@@ -24,12 +31,28 @@ public class VentaController {
     private final FormaPagoService formaPagoService;
     private final SerieComprobanteService serieComprobanteService;
 
-    public VentaController(VentaService ventaService, FormaPagoService formaPagoService, SerieComprobanteService serieComprobanteService) {
+    /**
+     * Constructor para la inyección de dependencias de los servicios necesarios.
+     *
+     * @param ventaService            Servicio para la lógica de negocio de las
+     *                                ventas.
+     * @param formaPagoService        Servicio para obtener las formas de pago.
+     * @param serieComprobanteService Servicio para obtener las series de
+     *                                comprobantes.
+     */
+    public VentaController(VentaService ventaService, FormaPagoService formaPagoService,
+            SerieComprobanteService serieComprobanteService) {
         this.ventaService = ventaService;
         this.formaPagoService = formaPagoService;
         this.serieComprobanteService = serieComprobanteService;
     }
 
+    /**
+     * Muestra la página de gestión de ventas.
+     *
+     * @param model El modelo para pasar datos a la vista.
+     * @return El nombre de la vista "ventas".
+     */
     @GetMapping("/listar")
     public String listarVentas(Model model) {
         List<Venta> ventas = ventaService.listarVentas();
@@ -38,6 +61,11 @@ public class VentaController {
         return "ventas";
     }
 
+    /**
+     * Endpoint de la API para obtener todas las ventas.
+     *
+     * @return Un {@link ResponseEntity} con la lista de ventas en formato JSON.
+     */
     @GetMapping("/api/listar")
     @ResponseBody
     public ResponseEntity<?> listarVentasApi() {
@@ -48,6 +76,13 @@ public class VentaController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Endpoint de la API para obtener una venta específica por su ID.
+     *
+     * @param id El ID de la venta a obtener.
+     * @return Un {@link ResponseEntity} con los datos de la venta o un estado 404
+     *         si no se encuentra.
+     */
     @GetMapping("/api/ventas_id/{id}")
     public ResponseEntity<?> obtenerVentaPorId(@PathVariable Long id) {
         try {
@@ -66,6 +101,11 @@ public class VentaController {
         }
     }
 
+    /**
+     * Endpoint de la API para obtener todas las formas de pago disponibles.
+     *
+     * @return Un {@link ResponseEntity} con la lista de formas de pago.
+     */
     @GetMapping("/api/formaPago")
     @ResponseBody
     public ResponseEntity<?> listarFormasPagoApi() {
@@ -75,6 +115,11 @@ public class VentaController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Endpoint de la API para obtener todas las series de comprobantes disponibles.
+     *
+     * @return Un {@link ResponseEntity} con la lista de series de comprobantes.
+     */
     @GetMapping("/api/serieComprobante")
     @ResponseBody
     public ResponseEntity<?> listarSeriesComprobanteApi() {
@@ -84,6 +129,13 @@ public class VentaController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Endpoint de la API para crear una nueva venta.
+     *
+     * @param venta El DTO con los datos de la venta a crear, validado.
+     * @return Un {@link ResponseEntity} con la venta creada y un estado 201
+     *         (Created).
+     */
     @PostMapping("/api/guardar")
     @ResponseBody
     public ResponseEntity<?> guardarVentaApi(@Valid @RequestBody VentaDTO venta) {
@@ -104,7 +156,13 @@ public class VentaController {
         }
     }
 
-
+    /**
+     * Endpoint de la API para actualizar (reemplazar) una venta existente.
+     *
+     * @param id           El ID de la venta a actualizar.
+     * @param ventaRequest El DTO con los nuevos datos de la venta.
+     * @return Un {@link ResponseEntity} con la venta actualizada.
+     */
     @PutMapping("/api/actualizar/{id}")
     @ResponseBody
     public ResponseEntity<?> actualizarVenta(@PathVariable Long id, @Valid @RequestBody VentaDTO ventaRequest) {
@@ -123,7 +181,12 @@ public class VentaController {
         }
     }
 
-
+    /**
+     * Endpoint de la API para anular una venta.
+     *
+     * @param id El ID de la venta a anular.
+     * @return Un {@link ResponseEntity} con la venta anulada.
+     */
     @DeleteMapping("/api/eliminar/{id}")
     @ResponseBody
     public ResponseEntity<?> eliminarVentaApi(@PathVariable Long id) {
@@ -135,6 +198,12 @@ public class VentaController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Endpoint de la API para obtener las cuotas de una venta específica.
+     *
+     * @param ventaId El ID de la venta de la cual se quieren obtener las cuotas.
+     * @return Un {@link ResponseEntity} con la lista de cuotas.
+     */
     @GetMapping("/api/cuotas/{ventaId}")
     @ResponseBody
     public ResponseEntity<List<Cuota>> listarCuotasPorVenta(@PathVariable Long ventaId) {
@@ -142,12 +211,18 @@ public class VentaController {
         return ResponseEntity.ok(cuotas);
     }
 
+    /**
+     * Endpoint de la API para obtener los pagos realizados para una venta
+     * específica.
+     *
+     * @param ventaId El ID de la venta de la cual se quieren obtener los pagos.
+     * @return Un {@link ResponseEntity} con la lista de pagos.
+     */
     @GetMapping("/api/pagos/{ventaId}")
     @ResponseBody
     public ResponseEntity<List<Pago>> listarPagosPorVenta(@PathVariable Long ventaId) {
         List<Pago> pagos = ventaService.obtenerPagosPorVenta(ventaId);
         return ResponseEntity.ok(pagos);
     }
-
 
 }
