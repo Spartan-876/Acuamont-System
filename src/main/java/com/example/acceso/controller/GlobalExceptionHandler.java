@@ -8,30 +8,37 @@ import org.springframework.beans.TypeMismatchException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-// @ControllerAdvice: Convierte esta clase en un componente global que puede manejar
-// excepciones de todos los controladores de la aplicación.
+/**
+ * Manejador de excepciones global para toda la aplicación.
+ *
+ * Esta clase utiliza {@link ControllerAdvice} para interceptar y procesar
+ * excepciones que ocurren en cualquier controlador, proporcionando un punto
+ * centralizado para la gestión de errores.
+ */
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Inicializa un logger para registrar información útil cuando ocurra una
-    // excepción.
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    // @ExceptionHandler: Le dice a Spring que este método debe ejecutarse cada vez
-    // que se produzca una excepción de tipo TypeMismatchException en cualquier
-    // controlador.
-    // Esto ocurre, por ejemplo, si alguien intenta acceder a /usuarios/api/abc en
-    // lugar de /usuarios/api/123.
+    /**
+     * Maneja las excepciones {@link TypeMismatchException}.
+     *
+     * Este método se activa cuando un parámetro de una URL no coincide con el tipo
+     * esperado en la firma del método del controlador. Por ejemplo, si se espera un
+     * {@code Long} (como un ID) pero se recibe una cadena de texto como "abc".
+     *
+     * Registra una advertencia y redirige al usuario a la página de inicio para
+     * una experiencia de usuario más fluida en lugar de mostrar una página de
+     * error.
+     *
+     * @param ex La excepción {@link TypeMismatchException} capturada.
+     * @return Una cadena de redirección a la URL raíz ("/").
+     */
     @ExceptionHandler(TypeMismatchException.class)
     public String handleTypeMismatchException(TypeMismatchException ex) {
-        // Registra una advertencia en la consola con detalles sobre el error.
-        // Es una buena práctica para saber qué tipo de errores están ocurriendo.
         logger.warn("Se detectó un intento de acceder a una URL con un tipo de dato incorrecto. " +
                 "Valor: '{}', Tipo requerido: '{}'. Redirigiendo a la página de inicio.",
                 ex.getValue(), ex.getRequiredType());
-        // En lugar de mostrar una página de error genérica, redirige al usuario a la
-        // página
-        // de inicio, lo cual es una experiencia de usuario más amigable.
         return "redirect:/";
     }
 }

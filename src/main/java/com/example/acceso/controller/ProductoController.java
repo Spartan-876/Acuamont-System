@@ -15,17 +15,35 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Controlador para gestionar las operaciones CRUD de los productos.
+ *
+ * Proporciona endpoints para la vista de gestión de productos y una API REST
+ * para interactuar con los datos de productos, incluyendo la carga de imágenes.
+ */
 @Controller
 @RequestMapping("/productos")
 public class ProductoController {
     private final ProductoService productoService;
     private final CategoriaService categoriaService;
 
+    /**
+     * Constructor para la inyección de dependencias de los servicios de producto y categoría.
+     *
+     * @param productoService  El servicio que maneja la lógica de negocio de los productos.
+     * @param categoriaService El servicio que maneja la lógica de negocio de las categorías.
+     */
     public ProductoController(ProductoService productoService, CategoriaService categoriaService) {
         this.productoService = productoService;
         this.categoriaService = categoriaService;
     }
 
+    /**
+     * Muestra la página de gestión de productos.
+     *
+     * @param model El modelo para pasar datos a la vista.
+     * @return El nombre de la vista "productos".
+     */
     @GetMapping("/listar")
     public String listarProductos(Model model) {
         List<Producto> productos = productoService.listarProductos();
@@ -34,6 +52,11 @@ public class ProductoController {
         return "productos";
     }
 
+    /**
+     * Endpoint de la API para obtener todos los productos.
+     *
+     * @return Un {@link ResponseEntity} con la lista de productos en formato JSON.
+     */
     @GetMapping("/api/listar")
     @ResponseBody
     public ResponseEntity<?> listarProductosApi() {
@@ -44,6 +67,11 @@ public class ProductoController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Endpoint de la API para obtener todas las categorías activas.
+     *
+     * @return Un {@link ResponseEntity} con la lista de categorías activas.
+     */
     @GetMapping("/api/categorias")
     @ResponseBody
     public ResponseEntity<?> listarCategoriasActivas() {
@@ -53,6 +81,21 @@ public class ProductoController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Endpoint de la API para guardar o actualizar un producto.
+     * Este método maneja datos de formulario multipart, incluyendo una imagen opcional.
+     *
+     * @param id             El ID del producto a actualizar (opcional, nulo para creación).
+     * @param nombre         El nombre del producto.
+     * @param descripcion    La descripción del producto.
+     * @param precioCompra   El precio de compra del producto.
+     * @param precioVenta    El precio de venta del producto.
+     * @param stock          La cantidad en stock del producto.
+     * @param stockSeguridad El nivel mínimo de stock de seguridad.
+     * @param categoriaId    El ID de la categoría a la que pertenece el producto.
+     * @param imagen         El archivo de imagen del producto (opcional).
+     * @return Un {@link ResponseEntity} con el resultado de la operación.
+     */
     @PostMapping("/api/guardar")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> guardarProductoApi(
@@ -110,6 +153,12 @@ public class ProductoController {
     }
 
 
+    /**
+     * Endpoint de la API para obtener un producto por su ID.
+     *
+     * @param id El ID del producto a obtener.
+     * @return Un {@link ResponseEntity} con los datos del producto o un estado 404 si no se encuentra.
+     */
     @GetMapping("/api/{id}")
     @ResponseBody
     public ResponseEntity<?> obtenerProducto(@PathVariable Long id) {
@@ -128,6 +177,12 @@ public class ProductoController {
         }
     }
 
+    /**
+     * Endpoint de la API para realizar el borrado lógico de un producto.
+     *
+     * @param id El ID del producto a eliminar.
+     * @return Un {@link ResponseEntity} con el resultado de la operación.
+     */
     @DeleteMapping("/api/eliminar/{id}")
     @ResponseBody
     public ResponseEntity<?> eliminarProductoAjax(@PathVariable Long id) {
@@ -149,6 +204,12 @@ public class ProductoController {
         }
     }
 
+    /**
+     * Endpoint de la API para cambiar el estado (activo/inactivo) de un producto.
+     *
+     * @param id El ID del producto cuyo estado se va a cambiar.
+     * @return Un {@link ResponseEntity} con el producto actualizado o un error si no se encuentra.
+     */
     @PostMapping("/api/cambiar-estado/{id}")
     @ResponseBody
     public ResponseEntity<?> cambiarEstadoProductoAjax(@PathVariable Long id) {

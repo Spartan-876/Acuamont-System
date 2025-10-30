@@ -303,12 +303,26 @@ $(document).ready(function () {
                 let externalData = await externalResp.json();
 
                 if (externalResp.ok && externalData.success && externalData.datos) {
-                    const persona = externalData.datos;
-                    const nombreCompleto = [
-                        persona.nombres,
-                        persona.ape_paterno,
-                        persona.ape_materno
-                    ].filter(Boolean).join(' ');
+                    const datos = externalData.datos;
+                    let nombreCompleto = '';
+
+                    if (datos.razon_social) {
+                        nombreCompleto = datos.razon_social;
+                    }
+                    else if (datos.nombres) {
+                        nombreCompleto = [
+                            datos.nombres,
+                            datos.ape_paterno,
+                            datos.ape_materno
+                        ].filter(Boolean).join(' ');
+                    }
+                    else {
+                        throw new Error('Formato de datos externos no reconocido.');
+                    }
+
+                    if (!nombreCompleto) {
+                        throw new Error('No se pudo extraer un nombre de la API externa.');
+                    }
 
                     let createResp = await fetch(ENDPOINTS.guardar_cliente, {
                         method: 'POST',
@@ -329,6 +343,7 @@ $(document).ready(function () {
                     $('#nombreCliente').val(nombreCompleto);
                     clienteSeleccionadoId = nuevoCliente.cliente.id;
                     showNotification('Cliente encontrado en API externa y creado localmente', 'success');
+
                 } else {
                     $('#nombreCliente').val('');
                     clienteSeleccionadoId = null;

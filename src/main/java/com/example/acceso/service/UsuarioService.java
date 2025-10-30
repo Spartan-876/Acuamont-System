@@ -10,25 +10,57 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Servicio para gestionar la lógica de negocio de los usuarios.
+ *
+ * Proporciona métodos para operaciones CRUD (Crear, Leer, Actualizar, Eliminar)
+ * sobre las entidades de Usuario, manejando la lógica de negocio como
+ * validaciones, encriptación de contraseñas y transacciones.
+ */
 @Service
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
+    /**
+     * Constructor para la inyección de dependencias del repositorio de usuarios.
+     * Inicializa el codificador de contraseñas BCrypt.
+     *
+     * @param usuarioRepository El repositorio para las operaciones de base de datos
+     *                          de Usuario.
+     */
     public UsuarioService(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
+    /**
+     * Obtiene una lista de todos los usuarios que no están eliminados lógicamente.
+     *
+     * @return Una lista de objetos {@link Usuario}.
+     */
     @Transactional(readOnly = true)
     public List<Usuario> listarUsuarios() {
-        // Excluimos a los usuarios con estado 2 (eliminados lógicamente)
-        // Nota: Necesitarás crear este método en tu UsuarioRepository.
-        // Ejemplo: List<Usuario> findAllByEstadoNot(Integer estado);
         return usuarioRepository.findAllByEstadoNot(2);
     }
 
+    /**
+     * Guarda o actualiza un usuario en la base de datos.
+     * <p>
+     * Si el usuario tiene un ID, se actualiza. Si no, se crea uno nuevo.
+     * Realiza validaciones, normaliza los datos (trim, toLowerCase) y encripta la
+     * contraseña.
+     *
+     * @param usuario El objeto {@link Usuario} a guardar.
+     * @return El usuario guardado con su ID asignado o actualizado.
+     * @throws IllegalArgumentException Si faltan campos obligatorios, si ya existe
+     *                                  un usuario/correo,
+     *                                  o si ocurre otro error de integridad de
+     *                                  datos.
+     * @throws RuntimeException         Si ocurre un error inesperado durante el
+     *                                  proceso.
+     */
     @Transactional
     public Usuario guardarUsuario(Usuario usuario) {
         try {
@@ -93,14 +125,23 @@ public class UsuarioService {
         }
     }
 
+    /**
+     * Cuenta el número total de usuarios que no están eliminados lógicamente.
+     *
+     * @return El número de usuarios activos e inactivos.
+     */
     @Transactional(readOnly = true)
     public long contarUsuarios() {
-        // Contamos solo los usuarios que no están eliminados lógicamente
-        // Nota: Necesitarás crear este método en tu UsuarioRepository.
-        // Ejemplo: long countByEstadoNot(Integer estado);
         return usuarioRepository.countByEstadoNot(2);
     }
 
+    /**
+     * Busca un usuario por su ID.
+     *
+     * @param id El ID del usuario a buscar.
+     * @return Un {@link Optional} que contiene el usuario si se encuentra, o un
+     *         Optional vacío si no.
+     */
     @Transactional(readOnly = true)
     public Optional<Usuario> obtenerUsuarioPorId(Long id) {
         if (id == null || id <= 0) {
@@ -109,11 +150,26 @@ public class UsuarioService {
         return usuarioRepository.findById(id);
     }
 
+    /**
+     * Busca un usuario por su nombre de usuario (login).
+     * La búsqueda no distingue mayúsculas de minúsculas.
+     *
+     * @param usuario El nombre de usuario a buscar.
+     * @return Un {@link Optional} que contiene el usuario si se encuentra, o un
+     *         Optional vacío si no.
+     */
     @Transactional(readOnly = true)
     public Optional<Usuario> findByUsuario(String usuario) {
         return usuarioRepository.findByUsuario(usuario.trim().toLowerCase());
     }
 
+    /**
+     * Realiza el borrado lógico de un usuario, cambiando su estado a 2.
+     *
+     * @param id El ID del usuario a eliminar.
+     * @throws IllegalArgumentException si el ID es inválido o el usuario no se
+     *                                  encuentra.
+     */
     @Transactional
     public void eliminarUsuario(Long id) {
         if (id == null || id <= 0) {
@@ -128,6 +184,15 @@ public class UsuarioService {
         usuarioRepository.save(usuario);
     }
 
+    /**
+     * Cambia el estado de un usuario entre activo (1) e inactivo (0).
+     * <p>
+     * Si el usuario está eliminado (estado 2), no se realiza ningún cambio.
+     *
+     * @param id El ID del usuario cuyo estado se va a cambiar.
+     * @return Un {@link Optional} con el usuario actualizado si se encontró, o un
+     *         Optional vacío si no.
+     */
     @Transactional
     public Optional<Usuario> cambiarEstadoUsuario(Long id) {
         if (id == null || id <= 0) {
@@ -147,39 +212,58 @@ public class UsuarioService {
     }
 
     /**
-     * Verifica si un nombre de usuario ya existe
+     * Verifica si ya existe un usuario con un nombre de usuario específico.
+     *
+     * @param nombreUsuario El nombre de usuario a verificar.
+     * @return {@code true} si el nombre de usuario ya existe, {@code false} en caso
+     *         contrario.
      */
     @Transactional(readOnly = true)
     public boolean existeUsuario(String nombreUsuario) {
         if (nombreUsuario == null || nombreUsuario.trim().isEmpty()) {
             return false;
         }
-        // Utiliza el método eficiente del repositorio
         return usuarioRepository.existsByUsuario(nombreUsuario.trim().toLowerCase());
     }
 
     /**
-     * Verifica si un correo ya existe
+     * Verifica si ya existe un usuario con un correo electrónico específico.
+     *
+     * @param correo El correo electrónico a verificar.
+     * @return {@code true} si el correo ya existe, {@code false} en caso contrario.
      */
     @Transactional(readOnly = true)
     public boolean existeCorreo(String correo) {
         if (correo == null || correo.trim().isEmpty()) {
             return false;
         }
-        // Utiliza el método eficiente del repositorio
         return usuarioRepository.existsByCorreo(correo.trim().toLowerCase());
     }
 
     /**
-     * Verifica la contraseña de un usuario
+     * Compara una contraseña en texto plano con una contraseña encriptada usando
+     * BCrypt.
+     *
+     * @param contrasenaTextoPlano La contraseña ingresada por el usuario.
+     * @param contrasenaEncriptada La contraseña almacenada en la base de datos.
+     * @return {@code true} si las contraseñas coinciden, {@code false} en caso
+     *         contrario.
      */
     public boolean verificarContrasena(String contrasenaTextoPlano, String contrasenaEncriptada) {
         return passwordEncoder.matches(contrasenaTextoPlano, contrasenaEncriptada);
     }
-    
+
     /**
-     * Activa la autenticación de dos pasos (2FA) para un usuario.
-     * Guarda el secreto 2FA y marca al usuario como que usa 2FA.
+     * Activa la autenticación de dos factores (2FA) para un usuario.
+     * <p>
+     * Guarda el secreto 2FA en la base de datos y establece la bandera `usa2FA` en
+     * `true`.
+     *
+     * @param idUsuario  El ID del usuario para el cual se activará la 2FA.
+     * @param secreto2FA El secreto en formato Base32 que se compartirá con la app
+     *                   de autenticación.
+     * @throws IllegalArgumentException si no se encuentra un usuario con el ID
+     *                                  proporcionado.
      */
     @Transactional
     public void activar2FA(Long idUsuario, String secreto2FA) {

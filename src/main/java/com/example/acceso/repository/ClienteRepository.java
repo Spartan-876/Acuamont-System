@@ -16,6 +16,6 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
 
     List<Cliente> findAllByEstadoNot(Integer estado);
 
-    Long countByEstado(Integer estado);
+    Long countByEstadoNot(Integer estado);
 
 }
