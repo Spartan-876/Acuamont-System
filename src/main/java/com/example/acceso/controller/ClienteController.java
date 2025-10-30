@@ -2,7 +2,7 @@ package com.example.acceso.controller;
 
 import com.example.acceso.model.Cliente;
 import com.example.acceso.service.ClienteService;
-import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +17,15 @@ import java.util.Map;
 @Controller
 @RequestMapping("/clientes")
 public class ClienteController {
+
+    @Value("${miapi.token}")
+    private String tokenCode;
+
+    @Value("${miapi.url.dni}")
+    private String urlDni;
+
+    @Value("${miapi.url.ruc}")
+    private String urlRuc;
 
     private final ClienteService clienteService;
 
@@ -93,7 +102,6 @@ public class ClienteController {
         }
     }
 
-
     @GetMapping("/api/{id}")
     @ResponseBody
     public ResponseEntity<?> obtenerCliente(@PathVariable Long id) {
@@ -136,13 +144,13 @@ public class ClienteController {
     @GetMapping("/api/buscar-documento/{documento}")
     @ResponseBody
     public ResponseEntity<?> buscarPorDocumento(@PathVariable String documento) {
-        String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozNDIsImV4cCI6MTc2MDM3NTYzNH0.boaa7iYa3cB69Ynpvv9yPHY6GIG_419dcyUAkENPWa0";
+        String token = tokenCode;
         String url;
 
         if (documento.length() == 8) {
-            url = "https://miapi.cloud/v1/dni/" + documento;
+            url = urlDni + documento;
         } else if (documento.length() == 11) {
-            url = "https://miapi.cloud/v1/ruc/" + documento;
+            url = urlRuc + documento;
         } else {
             return ResponseEntity.badRequest()
                     .body(Map.of("success", false, "message", "Documento inválido"));
