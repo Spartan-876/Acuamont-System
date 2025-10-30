@@ -3,10 +3,8 @@ package com.example.acceso.controller;
 import com.example.acceso.DTO.VentaDTO;
 import com.example.acceso.model.Cuota;
 import com.example.acceso.model.Pago;
-import com.example.acceso.model.Usuario;
 import com.example.acceso.model.Venta;
 import com.example.acceso.service.*;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +12,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,13 +21,11 @@ import java.util.Map;
 public class VentaController {
 
     private final VentaService ventaService;
-    private final UsuarioService usuarioService;
     private final FormaPagoService formaPagoService;
     private final SerieComprobanteService serieComprobanteService;
 
-    public VentaController(VentaService ventaService, UsuarioService usuarioService, FormaPagoService formaPagoService, SerieComprobanteService serieComprobanteService) {
+    public VentaController(VentaService ventaService, FormaPagoService formaPagoService, SerieComprobanteService serieComprobanteService) {
         this.ventaService = ventaService;
-        this.usuarioService = usuarioService;
         this.formaPagoService = formaPagoService;
         this.serieComprobanteService = serieComprobanteService;
     }

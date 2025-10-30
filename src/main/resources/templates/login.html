@@ -56,6 +56,11 @@
                     <label for="clave" class="form-label">Contraseña</label>
                     <input type="password" class="form-control form-control-lg" id="clave" name="clave" required>
                 </div>
+                
+                <div class="mb-4">
+                    <label for="token" class="form-label">Token (si está activado)</label>
+                    <input type="text" class="form-control form-control-lg" id="token" name="token" placeholder="123456" maxlength="6" autocomplete="off">
+                </div>
 
                 <div class="d-grid">
                     <button class="btn btn-primary btn-lg" type="submit">Iniciar Sesión</button>
@@ -74,8 +79,9 @@
         loginForm.addEventListener('submit', function(event) {
             const username = document.getElementById('usuario').value;
             const password = document.getElementById('clave').value;
+            const token = document.getElementById('token').value;
 
-            if (!username || !password) {
+            if (!username || !password ) {
                 event.preventDefault(); // Detiene el envío del formulario
                 Swal.fire({
                     icon: 'warning',

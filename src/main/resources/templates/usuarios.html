@@ -193,6 +193,33 @@
     </div>
 </div>
 
+<!-- Modal 2FA -->
+<div class="modal fade" id="modal2FA" tabindex="-1" aria-labelledby="modal2FATitle" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal2FATitle">Configurar Autenticación de Dos Pasos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p>Escanea el siguiente código QR con tu aplicación de autenticación (ej. Google Authenticator).</p>
+                <img id="qrCode" src="" alt="Código QR" class="img-fluid mb-3">
+                <p class="text-muted">Si no puedes escanear, ingresa manualmente la clave:</p>
+                <p><strong id="secretKey" class="text-primary"></strong></p>
+                <hr>
+                <p>Luego, ingresa el código de 6 dígitos generado por la aplicación para verificar.</p>
+                <form id="formVerificar2FA">
+                    <input type="hidden" id="idUsuario2FA">
+                    <input type="text" class="form-control form-control-lg text-center" id="codigo2FA" name="codigo2FA" placeholder="123456" maxlength="6" required>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" form="formVerificar2FA" class="btn btn-primary">Verificar y Activar</button>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- Contenedor para notificaciones Toast -->
 <div id="notification-container" class="toast-container position-fixed top-0 end-0 p-3"></div>
 

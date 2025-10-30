@@ -1,7 +1,5 @@
 package com.example.acceso.DTO;
 
-import java.time.LocalDate;
-
 public class AjusteInventarioDTO {
 
     private Long productoId;

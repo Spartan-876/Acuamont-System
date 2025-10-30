@@ -2,6 +2,7 @@ package com.example.acceso.controller;
 
 import com.example.acceso.model.Opcion;
 import com.example.acceso.model.Usuario;
+import com.example.acceso.service.ServicioAutenticacionDosPasos;
 import com.example.acceso.service.UsuarioService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -17,9 +18,12 @@ import java.util.Optional;
 public class LoginController {
     // Inyección de dependencia del servicio de usuario.
     private final UsuarioService usuarioService;
+    private final ServicioAutenticacionDosPasos servicio2FA;
 
-    public LoginController(UsuarioService usuarioService) {
+
+    public LoginController(UsuarioService usuarioService, ServicioAutenticacionDosPasos servicio2FA) {
         this.usuarioService = usuarioService;
+        this.servicio2FA = servicio2FA;
     }
 
     // Maneja las peticiones GET a /login. Muestra el formulario de inicio de
@@ -38,7 +42,7 @@ public class LoginController {
 
     // Maneja las peticiones POST a /login, que se envían desde el formulario.
     @PostMapping("/login")
-    public String procesarLogin(@RequestParam String usuario, @RequestParam String clave, HttpSession session,
+    public String procesarLogin(@RequestParam String usuario, @RequestParam String clave, @RequestParam String token, HttpSession session,
             RedirectAttributes redirectAttributes) {
         // Busca al usuario en la base de datos por su nombre de usuario.
         Optional<Usuario> usuarioOpt = usuarioService.findByUsuario(usuario);
@@ -62,8 +66,22 @@ public class LoginController {
         }
 
         // Verificamos si la contraseña proporcionada coincide con la contraseña
-        // encriptada en la BD.
+        // encriptada en la BD. //
         if (usuarioService.verificarContrasena(clave, usuarioEncontrado.getClave())) {
+
+            // --- INICIO DE LA LÓGICA 2FA ---
+            if (usuarioEncontrado.isUsa2FA()) {
+                if (token == null || token.trim().isEmpty()) {
+                    redirectAttributes.addFlashAttribute("error", "Se requiere el token de seguridad.");
+                    return "redirect:/login";
+                }
+                if (!servicio2FA.esCodigoValido(usuarioEncontrado.getSecreto2FA(), token)) {
+                    redirectAttributes.addFlashAttribute("error", "El token de seguridad es incorrecto.");
+                    return "redirect:/login";
+                }
+            }
+            // --- FIN DE LA LÓGICA 2FA ---
+
             // Si la contraseña es correcta, guardamos el objeto Usuario en la sesión.
             // Esto es lo que nos permitirá saber que el usuario está "logueado" en futuras
             // peticiones.

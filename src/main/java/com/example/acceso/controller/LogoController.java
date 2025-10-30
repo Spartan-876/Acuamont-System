@@ -18,8 +18,7 @@ import java.nio.file.StandardCopyOption;
 public class LogoController {
 
     private final Path logoPath = Paths.get("iconos/");
-    private final String logoFileName = "logo2.jpg";
-
+    
     @GetMapping
     public String mostrarLogoPage() {
         return "redirect:/slides/listar";

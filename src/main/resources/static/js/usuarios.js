@@ -8,6 +8,7 @@ $(document).ready(function () {
     let dataTable;
     let isEditing = false;
     let usuarioModal;
+    let modal2FA;
     let usuario;
 
 
@@ -22,6 +23,8 @@ $(document).ready(function () {
         delete: (id) => `${API_BASE}/eliminar/${id}`,
         profiles: `${API_BASE}/perfiles`,
         toggleStatus: (id) => `${API_BASE}/cambiar-estado/${id}`,
+        generate2fa: (id) => `${API_BASE}/generar-2fa/${id}`,
+        verify2fa: `${API_BASE}/verificar-2fa`,
     };
 
     cargarDatosUsuarioLogueado();
@@ -31,6 +34,7 @@ $(document).ready(function () {
 
     // Inicializar Modal de Bootstrap
     usuarioModal = new bootstrap.Modal(document.getElementById('usuarioModal'));
+    modal2FA = new bootstrap.Modal(document.getElementById('modal2FA'));
 
     // Cargar perfiles para el select
     loadProfiles();
@@ -105,6 +109,9 @@ $(document).ready(function () {
                     <button data-id="${row.id}" class="btn btn-sm btn-danger action-delete" title="Eliminar">
                         <i class="bi bi-trash3-fill"></i>
                     </button>
+                    <button data-id="${row.id}" class="btn btn-sm ${row.usa2FA ? 'btn-info' : 'btn-secondary'} action-2fa" title="Configurar 2FA">
+                        <i class="bi bi-shield-lock-fill"></i>
+                    </button>
                 </div>
             `;
     }
@@ -128,6 +135,12 @@ $(document).ready(function () {
         $('#tablaUsuarios tbody').on('click', '.action-edit', handleEdit);
         $('#tablaUsuarios tbody').on('click', '.action-status', handleToggleStatus);
         $('#tablaUsuarios tbody').on('click', '.action-delete', handleDelete);
+        $('#tablaUsuarios tbody').on('click', '.action-2fa', handleSetup2FA);
+
+        $('#formVerificar2FA').on('submit', function (e) {
+            e.preventDefault();
+            verifyAndEnable2FA();
+        });
     }
 
     /**
@@ -358,6 +371,73 @@ $(document).ready(function () {
                     });
             }
         });
+    }
+
+    /**
+     * Maneja la configuración de 2FA
+     */
+    function handleSetup2FA(e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        $('#idUsuario2FA').val(id);
+
+        showLoading(true);
+        fetch(ENDPOINTS.generate2fa(id))
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    $('#qrCode').attr('src', data.qrCodeUri);
+                    // Se añade el estilo CSS para que la clave no se desborde de su contenedor.
+                    $('#secretKey')
+                        .text(data.secreto)
+                        .css('word-break', 'break-all');
+
+                    $('#codigo2FA').val('');
+                    modal2FA.show();
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error generando QR:', error);
+                showNotification('Error al iniciar la configuración de 2FA.', 'error');
+            })
+            .finally(() => {
+                showLoading(false);
+            });
+    }
+
+    /**
+     * Verifica el código y activa 2FA
+     */
+    function verifyAndEnable2FA() {
+        const payload = {
+            id: $('#idUsuario2FA').val(),
+            codigo: $('#codigo2FA').val(),
+            secreto: $('#secretKey').text()
+        };
+
+        showLoading(true);
+        fetch(ENDPOINTS.verify2fa, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                modal2FA.hide();
+                showNotification(data.message, 'success');
+                loadUsuarios(); // Recargar para mostrar el botón actualizado
+            } else {
+                showNotification(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error verificando código:', error);
+            showNotification('Error de conexión al verificar el código.', 'error');
+        })
+        .finally(() => showLoading(false));
     }
 
     /**
