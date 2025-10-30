@@ -39,6 +39,12 @@ public class Usuario {
     @JoinColumn(name = "id_perfil")
     private Perfil perfil;
 
+    @Column(name = "usa_2fa", nullable = false)
+    private boolean usa2FA = false;
+
+    @Column(name = "secreto_2fa")
+    private String secreto2FA;
+
     // Constructor por defecto
     public Usuario() {
     }
@@ -109,6 +115,22 @@ public class Usuario {
         this.perfil = perfil;
     }
 
+    public boolean isUsa2FA() {
+        return usa2FA;
+    }
+
+    public void setUsa2FA(boolean usa2FA) {
+        this.usa2FA = usa2FA;
+    }
+
+    public String getSecreto2FA() {
+        return secreto2FA;
+    }
+
+    public void setSecreto2FA(String secreto2FA) {
+        this.secreto2FA = secreto2FA;
+    }
+    
     @Override
     public String toString() {
         return "Usuario{" +

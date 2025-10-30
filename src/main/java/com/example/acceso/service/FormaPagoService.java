@@ -1,6 +1,5 @@
 package com.example.acceso.service;
 
-import com.example.acceso.model.Categoria;
 import com.example.acceso.model.FormaPago;
 import com.example.acceso.repository.FormaPagoRepository;
 import org.springframework.stereotype.Service;

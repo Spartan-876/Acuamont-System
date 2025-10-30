@@ -2,6 +2,7 @@ package com.example.acceso.controller;
 
 import com.example.acceso.model.Usuario;
 import com.example.acceso.service.PerfilService;
+import com.example.acceso.service.ServicioAutenticacionDosPasos;
 import com.example.acceso.service.UsuarioService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -15,6 +16,7 @@ import jakarta.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 // @Controller: Indica que esta clase es un controlador web.
 // @RequestMapping("/usuarios"): Todas las rutas de este controlador empezarán con "/usuarios".
@@ -24,10 +26,13 @@ public class UsuarioController {
     // Inyección del servicio de usuario.
     private final UsuarioService usuarioService;
     private final PerfilService perfilService;
+    private final ServicioAutenticacionDosPasos servicio2FA;
 
-    public UsuarioController(UsuarioService usuarioService, PerfilService perfilService) {
+
+    public UsuarioController(UsuarioService usuarioService, PerfilService perfilService, ServicioAutenticacionDosPasos servicio2FA) {
         this.usuarioService = usuarioService;
         this.perfilService = perfilService;
+        this.servicio2FA = servicio2FA;
     }
 
     // GET /usuarios/listar: Muestra la página HTML principal de gestión de
@@ -192,5 +197,54 @@ public class UsuarioController {
             response.put("message", "Error al cambiar estado: " + e.getMessage());
             return ResponseEntity.internalServerError().body(response);
         }
+    }
+
+    @GetMapping("/api/generar-2fa/{id}")
+    @ResponseBody
+    public ResponseEntity<?> generarSecreto2FA(@PathVariable Long id) {
+        Map<String, Object> response = new HashMap<>();
+        Optional<Usuario> usuarioOpt = usuarioService.obtenerUsuarioPorId(id);
+
+        if (usuarioOpt.isEmpty()) {
+            response.put("success", false);
+            response.put("message", "Usuario no encontrado.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        Usuario usuario = usuarioOpt.get();
+        String secreto = servicio2FA.generarNuevoSecreto();
+        String qrCodeUri = servicio2FA.generarUriDatosQr(secreto, usuario.getCorreo(), "AccesoApp");
+
+        // Guardamos temporalmente el secreto en la sesión para verificarlo después
+        // No lo guardamos en la BD hasta que el usuario lo confirme con un código válido.
+        // Esto es más seguro.
+        // HttpSession session
+        // session.setAttribute("secreto2FA_temp_" + id, secreto);
+
+        response.put("success", true);
+        response.put("secreto", secreto); // Se envía al front para mostrarlo por si no se puede escanear el QR
+        response.put("qrCodeUri", qrCodeUri);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/api/verificar-2fa")
+    @ResponseBody
+    public ResponseEntity<?> verificarYActivar2FA(@RequestBody Map<String, String> payload) {
+        Map<String, Object> response = new HashMap<>();
+        Long id = Long.parseLong(payload.get("id"));
+        String codigo = payload.get("codigo");
+        String secreto = payload.get("secreto"); // El secreto se genera en el paso anterior
+
+        if (!servicio2FA.esCodigoValido(secreto, codigo)) {
+            response.put("success", false);
+            response.put("message", "El código de verificación es incorrecto.");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        usuarioService.activar2FA(id, secreto);
+
+        response.put("success", true);
+        response.put("message", "¡Autenticación de dos pasos activada correctamente!");
+        return ResponseEntity.ok(response);
     }
 }

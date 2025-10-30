@@ -176,4 +176,18 @@ public class UsuarioService {
     public boolean verificarContrasena(String contrasenaTextoPlano, String contrasenaEncriptada) {
         return passwordEncoder.matches(contrasenaTextoPlano, contrasenaEncriptada);
     }
+    
+    /**
+     * Activa la autenticación de dos pasos (2FA) para un usuario.
+     * Guarda el secreto 2FA y marca al usuario como que usa 2FA.
+     */
+    @Transactional
+    public void activar2FA(Long idUsuario, String secreto2FA) {
+        Usuario usuario = usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + idUsuario));
+
+        usuario.setSecreto2FA(secreto2FA);
+        usuario.setUsa2FA(true);
+        usuarioRepository.save(usuario);
+    }
 }
