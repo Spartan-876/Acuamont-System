@@ -152,7 +152,7 @@ public class ClienteService {
     @Transactional
     public Optional<Cliente> cambiarEstadoCliente(Long id) {
         if (id == null || id <= 0) {
-            return Optional.empty();
+            throw new IllegalArgumentException("ID de cliente inválido");
         }
 
         return obtenerClientePorId(id).map(cliente -> {
