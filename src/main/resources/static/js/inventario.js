@@ -92,7 +92,7 @@ $(document).ready(function () {
                     customize: function (win) {
                         $(win.document.body)
                             .css('font-size', '10pt')
-                            .prepend('<h3 style="text-align:center;">Listado de Productos</h3>');
+                            .prepend('<h3 style="text-align:center;">Listado de Inventarios</h3>');
                     }
                 }
             ]
@@ -266,7 +266,6 @@ $(document).ready(function () {
                                 customize: function (win) {
                                     $(win.document.body)
                                         .css('font-size', '10pt')
-                                        .prepend(`<h3 style="text-align:center;">Listado de Productos</h3>`);
                                 }
                             }
                         ]
@@ -501,7 +500,6 @@ $(document).ready(function () {
                                 customize: function (win) {
                                     $(win.document.body)
                                         .css('font-size', '10pt')
-                                        .prepend(`<h3 style="text-align:center;">Listado de Productos</h3>`);
                                 }
                             }
                         ]

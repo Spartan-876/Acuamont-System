@@ -1,9 +1,9 @@
 $(document).ready(function () {
     let dataTable;
     let isEditing = false;
-    let clienteModal;
+    let proveedorModal;
 
-    const API_BASE_URL = '/clientes/api';
+    const API_BASE_URL = '/proveedores/api';
     const ENDPOINTS = {
         list: `${API_BASE_URL}/listar`,
         save: `${API_BASE_URL}/guardar`,
@@ -15,7 +15,7 @@ $(document).ready(function () {
 
     initializeDataTable();
 
-    clienteModal = new bootstrap.Modal(document.getElementById('clienteModal'));
+    proveedorModal = new bootstrap.Modal(document.getElementById('proveedorModal'));
 
     $('#btnBuscarDocumento').on('click', function () {
         const doc = $('#documento').val().trim();
@@ -26,7 +26,7 @@ $(document).ready(function () {
 
 
     function initializeDataTable() {
-        dataTable = $('#tablaClientes').DataTable({
+        dataTable = $('#tablaProveedores').DataTable({
             responsive: true,
             processing: true,
             deferRender: true,
@@ -73,7 +73,7 @@ $(document).ready(function () {
                 {
                     extend: 'excelHtml5',
                     text: '<i class="bi bi-file-earmark-excel"></i> Exportar a Excel',
-                    title: 'Listado de Clientes',
+                    title: 'Listado de Proveedores',
                     className: 'btn btn-success',
                     exportOptions: {
                         columns: [0, 1, 2, 3, 4, 5],
@@ -85,7 +85,7 @@ $(document).ready(function () {
                 {
                     extend: 'pdfHtml5',
                     text: '<i class="bi bi-file-earmark-pdf"></i> Exportar a PDF',
-                    title: 'Listado de Clientes',
+                    title: 'Listado de Proveedores',
                     className: 'btn btn-danger',
                     orientation: 'landscape',
                     pageSize: 'A4',
@@ -111,7 +111,7 @@ $(document).ready(function () {
                     customize: function (win) {
                         $(win.document.body)
                             .css('font-size', '10pt')
-                            .prepend('<h3 style="text-align:center;">Listado de Clientes</h3>');
+                            .prepend('<h3 style="text-align:center;">Listado de Proveedores</h3>');
                     }
                 }
             ]
@@ -144,21 +144,21 @@ $(document).ready(function () {
     function setupEventListeners() {
         $('#btnNuevoRegistro').on('click', openModalForNew);
 
-        $('#formCliente').on('submit', function (e) {
+        $('#formProveedor').on('submit', function (e) {
             e.preventDefault();
-            saveCliente();
+            saveProveedor();
         });
 
-        $('#tablaClientes tbody').on('click', '.action-edit', handleEdit);
-        $('#tablaClientes tbody').on('click', '.action-status', handleToggleStatus);
-        $('#tablaClientes tbody').on('click', '.action-delete', handleDelete);
+        $('#tablaProveedores tbody').on('click', '.action-edit', handleEdit);
+        $('#tablaProveedores tbody').on('click', '.action-status', handleToggleStatus);
+        $('#tablaProveedores tbody').on('click', '.action-delete', handleDelete);
     }
 
-    function loadClientes() {
+    function loadProveedores() {
         dataTable.ajax.reload();
     }
 
-    function saveCliente() {
+    function saveProveedor() {
         clearFieldErrors();
 
         const formData = {
@@ -187,7 +187,7 @@ $(document).ready(function () {
                 if (data.success) {
                     hiddenModal();
                     showNotification(data.message, 'success');
-                    loadClientes();
+                    loadProveedores();
                 } else {
                     if (data.errors) {
                         Object.keys(data.errors).forEach(field => {
@@ -200,7 +200,7 @@ $(document).ready(function () {
             })
             .catch(error => {
                 console.error('Error:', error);
-                showNotification('Ocurrió un error al guardar el cliente.', 'error');
+                showNotification('Ocurrió un error al guardar el proveedor.', 'error');
             })
             .finally(() => {
                 showLoading(false);
@@ -216,7 +216,7 @@ $(document).ready(function () {
         fetch(ENDPOINTS.get(id))
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Cliente no encontrado');
+                    throw new Error('Proveedor no encontrado');
                 }
                 return response.json();
             })
@@ -224,12 +224,12 @@ $(document).ready(function () {
                 if (data.success) {
                     openModalForEdit(data.data);
                 } else {
-                    showNotification('Error al cargar el cliente:' + data.message, 'error');
+                    showNotification('Error al cargar el proveedor:' + data.message, 'error');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                showNotification('Ocurrió un error al cargar el cliente.', 'error');
+                showNotification('Ocurrió un error al cargar el proveedor.', 'error');
             })
             .finally(() => {
                 showLoading(false);
@@ -248,14 +248,14 @@ $(document).ready(function () {
             .then(data => {
                 if (data.success) {
                     showNotification(data.message, 'success');
-                    loadClientes();
+                    loadProveedores();
                 } else {
                     showNotification(data.message, 'error');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                showNotification('Ocurrió un error al cambiar el estado del cliente.', 'error');
+                showNotification('Ocurrió un error al cambiar el estado del proveedor.', 'error');
             })
             .finally(() => {
                 showLoading(false);
@@ -285,14 +285,14 @@ $(document).ready(function () {
                     .then(data => {
                         if (data.success) {
                             showNotification(data.message, 'success');
-                            loadClientes();
+                            loadProveedores();
                         } else {
                             showNotification(data.message, 'error');
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        showNotification('Ocurrió un error al eliminar el cliente.', 'error');
+                        showNotification('Ocurrió un error al eliminar el proveedor.', 'error');
                     })
                     .finally(() => {
                         showLoading(false);
@@ -304,36 +304,36 @@ $(document).ready(function () {
     function openModalForNew() {
         isEditing = false;
         clearForm();
-        $('#modalClienteTitle').text('Nuevo Cliente');
+        $('#modalProveedorTitle').text('Nuevo Proveedor');
         $('#nombre, #documento').prop('readonly', false);
         showModal();
     }
 
-    function openModalForEdit(cliente) {
+    function openModalForEdit(proveedor) {
         isEditing = true;
         clearForm();
-        $('#modalClienteTitle').text('Editar Cliente');
-        $('#id').val(cliente.id);
-        $('#nombre').val(cliente.nombre).prop('readonly', true);
-        $('#documento').val(cliente.documento).prop('readonly', true);
-        $('#telefono').val(cliente.telefono);
-        $('#correo').val(cliente.correo);
+        $('#modalProveedorTitle').text('Editar Proveedor');
+        $('#id').val(proveedor.id);
+        $('#nombre').val(proveedor.nombre).prop('readonly', true);
+        $('#documento').val(proveedor.documento).prop('readonly', true);
+        $('#telefono').val(proveedor.telefono);
+        $('#correo').val(proveedor.correo);
         showModal();
     }
 
 
     function showModal() {
-        clienteModal.show();
+        proveedorModal.show();
     }
 
     function hiddenModal() {
-        clienteModal.hide();
+        proveedorModal.hide();
         clearForm();
     }
 
     function clearForm() {
-        $('#formCliente')[0].reset();
-        $('#formCliente .form-control').removeClass('is-invalid');
+        $('#formProveedor')[0].reset();
+        $('#formProveedor .form-control').removeClass('is-invalid');
         $(' .invalid-feedback').text('');
         isEditing = false;
     }
@@ -364,7 +364,7 @@ $(document).ready(function () {
 
     function clearFieldErrors() {
         $('.invalid-feedback').text('');
-        $('#formCliente .form-control').removeClass('is-invalid');
+        $('#formProveedor .form-control').removeClass('is-invalid');
     }
 
     function showFieldError(fieldName, message) {
@@ -407,8 +407,8 @@ $(document).ready(function () {
     }
 
     function buscarDocumento(doc) {
-        if (!doc || (doc.length !== 8 && doc.length !== 11) || isNaN(doc)) {
-            showNotification('Ingrese un DNI válido de 8 dígitos o RUC de 11 dígitos', 'error');
+        if (!doc || doc.length !== 11 || isNaN(doc)) {
+            showNotification('Ingrese un RUC de 11 dígitos', 'error');
             return;
         }
 
@@ -422,10 +422,7 @@ $(document).ready(function () {
                 if (data.success && data.datos) {
                     const persona = data.datos;
 
-                    if (doc.length === 8) {
-                        $('#nombre').val(`${persona.nombres || ''} ${persona.ape_paterno || ''} ${persona.ape_materno || ''}`.trim());
-                        $('#documento').val(persona.dni || doc);
-                    } else if (doc.length === 11) {
+                    if (doc.length === 11) {
                         $('#nombre').val(persona.razon_social || '');
                         $('#documento').val(persona.ruc || doc);
                     }
