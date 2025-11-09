@@ -3,7 +3,7 @@ package com.example.acceso.services;
 
 import com.example.acceso.model.Usuario;
 import com.example.acceso.repository.UsuarioRepository;
-import com.example.acceso.service.UsuarioService;
+import com.example.acceso.service.Implements.UsuarioServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ class UsuarioServiceTest {
     private UsuarioRepository usuarioRepository;
 
     @InjectMocks
-    private UsuarioService usuarioService;
+    private UsuarioServiceImpl usuarioService;
 
     private Usuario usuarioBase;
 

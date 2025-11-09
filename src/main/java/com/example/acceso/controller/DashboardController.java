@@ -1,9 +1,13 @@
 package com.example.acceso.controller;
 
-import com.example.acceso.service.CategoriaService;
-import com.example.acceso.service.ProductoService;
-import com.example.acceso.service.UsuarioService;
-import com.example.acceso.service.VentaService;
+import com.example.acceso.service.Implements.CategoriaServiceImpl;
+import com.example.acceso.service.Implements.ProductoServiceImpl;
+import com.example.acceso.service.Implements.UsuarioServiceImpl;
+import com.example.acceso.service.Implements.VentaServiceImpl;
+import com.example.acceso.service.Interfaces.CategoriaService;
+import com.example.acceso.service.Interfaces.ProductoService;
+import com.example.acceso.service.Interfaces.UsuarioService;
+import com.example.acceso.service.Interfaces.VentaService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

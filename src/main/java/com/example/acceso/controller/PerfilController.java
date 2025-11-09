@@ -1,7 +1,7 @@
 package com.example.acceso.controller;
 
 import com.example.acceso.model.Perfil;
-import com.example.acceso.service.PerfilService;
+import com.example.acceso.service.Interfaces.PerfilService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

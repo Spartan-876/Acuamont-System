@@ -1,4 +1,4 @@
-package com.example.acceso.service;
+package com.example.acceso.service.Implements;
 
 import com.example.acceso.DTO.AjusteInventarioDTO;
 import com.example.acceso.model.AjusteInventario;
@@ -6,6 +6,7 @@ import com.example.acceso.model.Producto;
 import com.example.acceso.model.TipoMovimiento;
 import com.example.acceso.repository.AjusteInventarioRepository;
 import com.example.acceso.repository.TipoMovimientoRepository;
+import com.example.acceso.service.Interfaces.AjusteInventarioService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,11 +20,11 @@ import java.util.List;
  * existentes por producto.
  */
 @Service
-public class AjusteInventarioService {
+public class AjusteInventarioServiceImpl implements AjusteInventarioService {
 
     private final AjusteInventarioRepository ajusteInventarioRepository;
     private final TipoMovimientoRepository tipoMovimientoRepository;
-    private final ProductoService productoService;
+    private final ProductoServiceImpl productoService;
 
     /**
      * Constructor para la inyección de dependencias de los repositorios y servicios
@@ -36,8 +37,8 @@ public class AjusteInventarioService {
      * @param productoService            Servicio para acceder a la lógica de
      *                                   negocio de los productos.
      */
-    public AjusteInventarioService(AjusteInventarioRepository ajusteInventarioRepository,
-            TipoMovimientoRepository tipoMovimientoRepository, ProductoService productoService) {
+    public AjusteInventarioServiceImpl(AjusteInventarioRepository ajusteInventarioRepository,
+                                       TipoMovimientoRepository tipoMovimientoRepository, ProductoServiceImpl productoService) {
         this.ajusteInventarioRepository = ajusteInventarioRepository;
         this.tipoMovimientoRepository = tipoMovimientoRepository;
         this.productoService = productoService;

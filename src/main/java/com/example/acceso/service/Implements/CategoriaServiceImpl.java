@@ -1,7 +1,8 @@
-package com.example.acceso.service;
+package com.example.acceso.service.Implements;
 
 import com.example.acceso.model.Categoria;
 import com.example.acceso.repository.CategoriaRepository;
+import com.example.acceso.service.Interfaces.CategoriaService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +18,7 @@ import java.util.Optional;
  * validaciones y transacciones.
  */
 @Service
-public class CategoriaService {
+public class CategoriaServiceImpl implements CategoriaService {
 
     private final CategoriaRepository categoriaRepository;
 
@@ -27,7 +28,7 @@ public class CategoriaService {
      * @param categoriaRepository El repositorio para las operaciones de base de
      *                            datos de Categoria.
      */
-    public CategoriaService(CategoriaRepository categoriaRepository) {
+    public CategoriaServiceImpl(CategoriaRepository categoriaRepository) {
         this.categoriaRepository = categoriaRepository;
     }
 

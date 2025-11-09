@@ -2,7 +2,8 @@ package com.example.acceso.controller;
 
 import com.example.acceso.DTO.PagosDTO;
 import com.example.acceso.model.Venta;
-import com.example.acceso.service.VentaService;
+import com.example.acceso.service.Implements.VentaServiceImpl;
+import com.example.acceso.service.Interfaces.VentaService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -34,7 +35,7 @@ public class PagoController {
     /**
      * Endpoint de la API para registrar un nuevo pago para una venta existente.
      *
-     * Recibe los detalles del pago, lo procesa a través del {@link VentaService} y
+     * Recibe los detalles del pago, lo procesa a través del {@link VentaServiceImpl} y
      * devuelve la entidad de la venta con su estado actualizado (cuotas pagadas, saldo, etc.).
      *
      * @param pagoRequest El DTO que contiene la información del pago a registrar, validado.

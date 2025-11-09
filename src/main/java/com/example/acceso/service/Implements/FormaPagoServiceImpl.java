@@ -1,7 +1,8 @@
-package com.example.acceso.service;
+package com.example.acceso.service.Implements;
 
 import com.example.acceso.model.FormaPago;
 import com.example.acceso.repository.FormaPagoRepository;
+import com.example.acceso.service.Interfaces.FormaPagoService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +16,7 @@ import java.util.Optional;
  * en el sistema, que se utilizarán principalmente en el proceso de venta.
  */
 @Service
-public class FormaPagoService {
+public class FormaPagoServiceImpl implements FormaPagoService {
 
     private final FormaPagoRepository formaPagoRepository;
 
@@ -24,7 +25,7 @@ public class FormaPagoService {
      *
      * @param formaPagoRepository El repositorio para las operaciones de base de datos de {@link FormaPago}.
      */
-    public FormaPagoService(FormaPagoRepository formaPagoRepository) {
+    public FormaPagoServiceImpl(FormaPagoRepository formaPagoRepository) {
         this.formaPagoRepository = formaPagoRepository;
     }
 

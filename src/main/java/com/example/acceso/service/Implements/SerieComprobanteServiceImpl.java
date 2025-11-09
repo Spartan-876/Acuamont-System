@@ -1,7 +1,8 @@
-package com.example.acceso.service;
+package com.example.acceso.service.Implements;
 
 import com.example.acceso.model.SerieComprobante;
 import com.example.acceso.repository.SerieComprobanteRepository;
+import com.example.acceso.service.Interfaces.SerieComprobanteService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +16,7 @@ import java.util.Optional;
  * series de comprobantes utilizadas en las ventas.
  */
 @Service
-public class SerieComprobanteService {
+public class SerieComprobanteServiceImpl implements SerieComprobanteService {
 
     private final SerieComprobanteRepository serieComprobanteRepository;
 
@@ -26,7 +27,7 @@ public class SerieComprobanteService {
      * @param serieComprobanteRepository El repositorio para las operaciones de base
      *                                   de datos de {@link SerieComprobante}.
      */
-    public SerieComprobanteService(SerieComprobanteRepository serieComprobanteRepository) {
+    public SerieComprobanteServiceImpl(SerieComprobanteRepository serieComprobanteRepository) {
         this.serieComprobanteRepository = serieComprobanteRepository;
     }
 

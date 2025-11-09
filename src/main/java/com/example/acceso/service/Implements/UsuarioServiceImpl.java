@@ -1,7 +1,8 @@
-package com.example.acceso.service;
+package com.example.acceso.service.Implements;
 
 import com.example.acceso.model.Usuario;
 import com.example.acceso.repository.UsuarioRepository;
+import com.example.acceso.service.Interfaces.UsuarioService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ import java.util.Optional;
  * validaciones, encriptación de contraseñas y transacciones.
  */
 @Service
-public class UsuarioService {
+public class UsuarioServiceImpl implements UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final BCryptPasswordEncoder passwordEncoder;
@@ -30,7 +31,7 @@ public class UsuarioService {
      * @param usuarioRepository El repositorio para las operaciones de base de datos
      *                          de Usuario.
      */
-    public UsuarioService(UsuarioRepository usuarioRepository) {
+    public UsuarioServiceImpl(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = new BCryptPasswordEncoder();
     }

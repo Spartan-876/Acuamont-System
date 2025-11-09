@@ -19,7 +19,7 @@ import com.example.acceso.DTO.PagosDTO;
 import com.example.acceso.DTO.VentaDTO;
 import com.example.acceso.model.*;
 import com.example.acceso.repository.*;
-import com.example.acceso.service.VentaService;
+import com.example.acceso.service.Implements.VentaServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,7 +44,7 @@ class VentaServiceTest {
     @Mock private ProductoRepository productoRepository;
 
     @InjectMocks
-    private VentaService ventaService;
+    private VentaServiceImpl ventaService;
 
     // --- Mocks de objetos base para las pruebas ---
     private Cliente mockCliente;

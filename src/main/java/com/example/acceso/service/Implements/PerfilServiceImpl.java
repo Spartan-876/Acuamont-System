@@ -1,9 +1,10 @@
-package com.example.acceso.service;
+package com.example.acceso.service.Implements;
 
 import com.example.acceso.model.Perfil;
 import com.example.acceso.model.Opcion;
 import com.example.acceso.repository.PerfilRepository;
 import com.example.acceso.repository.OpcionRepository;
+import com.example.acceso.service.Interfaces.PerfilService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

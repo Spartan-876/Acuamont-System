@@ -1,9 +1,11 @@
 package com.example.acceso.controller;
 
 import com.example.acceso.model.Usuario;
-import com.example.acceso.service.PerfilService;
-import com.example.acceso.service.ServicioAutenticacionDosPasos;
-import com.example.acceso.service.UsuarioService;
+import com.example.acceso.service.Interfaces.PerfilService;
+import com.example.acceso.service.Implements.ServicioAutenticacionDosPasosImpl;
+import com.example.acceso.service.Implements.UsuarioServiceImpl;
+import com.example.acceso.service.Interfaces.ServicioAutenticacionDosPasos;
+import com.example.acceso.service.Interfaces.UsuarioService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.http.ResponseEntity;

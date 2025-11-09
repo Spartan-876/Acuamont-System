@@ -1,4 +1,4 @@
-package com.example.acceso.service;
+package com.example.acceso.service.Implements;
 
 import com.example.acceso.DTO.CuotasProgramadasDTO;
 import com.example.acceso.DTO.DetalleVentaDTO;
@@ -6,6 +6,7 @@ import com.example.acceso.DTO.PagosDTO;
 import com.example.acceso.DTO.VentaDTO;
 import com.example.acceso.model.*;
 import com.example.acceso.repository.*;
+import com.example.acceso.service.Interfaces.VentaService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +25,7 @@ import java.util.List;
  * y cálculo de totales.
  */
 @Service
-public class VentaService {
+public class VentaServiceImpl implements VentaService {
 
     private final VentaRepository ventaRepository;
     private final ClienteRepository clienteRepository;
@@ -53,10 +54,10 @@ public class VentaService {
      * @param productoRepository         Repositorio para las operaciones de
      *                                   Producto.
      */
-    public VentaService(VentaRepository ventaRepository, ClienteRepository clienteRepository,
-            UsuarioRepository usuarioRepository, CuotaRepository cuotaRepository, PagoRepository pagoRepository,
-            SerieComprobanteRepository serieComprobanteRepository, FormaPagoRepository formaPagoRepository,
-            ProductoRepository productoRepository) {
+    public VentaServiceImpl(VentaRepository ventaRepository, ClienteRepository clienteRepository,
+                            UsuarioRepository usuarioRepository, CuotaRepository cuotaRepository, PagoRepository pagoRepository,
+                            SerieComprobanteRepository serieComprobanteRepository, FormaPagoRepository formaPagoRepository,
+                            ProductoRepository productoRepository) {
         this.ventaRepository = ventaRepository;
         this.clienteRepository = clienteRepository;
         this.usuarioRepository = usuarioRepository;

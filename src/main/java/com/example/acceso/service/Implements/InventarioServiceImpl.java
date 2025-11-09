@@ -1,9 +1,10 @@
-package com.example.acceso.service;
+package com.example.acceso.service.Implements;
 
 import com.example.acceso.model.TipoMovimiento;
 import com.example.acceso.model.Venta;
 import com.example.acceso.repository.TipoMovimientoRepository;
 import com.example.acceso.repository.VentaRepository;
+import com.example.acceso.service.Interfaces.InventarioService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.List;
  * y para listar los tipos de movimientos de ajuste disponibles.
  */
 @Service
-public class InventarioService {
+public class InventarioServiceImpl implements InventarioService {
 
     private final VentaRepository ventaRepository;
     private final TipoMovimientoRepository tipoMovimeintoRepository;
@@ -26,7 +27,7 @@ public class InventarioService {
      * @param ventaRepository          Repositorio para acceder a los datos de las ventas.
      * @param tipoMovimeintoRepository Repositorio para acceder a los tipos de movimiento.
      */
-    public InventarioService(VentaRepository ventaRepository, TipoMovimientoRepository tipoMovimeintoRepository) {
+    public InventarioServiceImpl(VentaRepository ventaRepository, TipoMovimientoRepository tipoMovimeintoRepository) {
         this.ventaRepository = ventaRepository;
         this.tipoMovimeintoRepository = tipoMovimeintoRepository;
     }

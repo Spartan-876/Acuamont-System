@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import com.example.acceso.model.Cliente;
 import com.example.acceso.repository.ClienteRepository;
-import com.example.acceso.service.ClienteService;
+import com.example.acceso.service.Implements.ClienteServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ class ClienteServiceTest {
     private ClienteRepository clienteRepository;
 
     @InjectMocks
-    private ClienteService clienteService;
+    private ClienteServiceImpl clienteService;
 
     private Cliente clienteActivo;
     private Cliente clienteInactivo;

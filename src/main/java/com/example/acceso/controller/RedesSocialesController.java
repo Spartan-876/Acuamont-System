@@ -2,7 +2,8 @@ package com.example.acceso.controller;
 
 import com.example.acceso.DTO.RedSocialDTO;
 import com.example.acceso.model.RedSocial;
-import com.example.acceso.service.RedSocialService;
+import com.example.acceso.service.Implements.RedSocialServiceImpl;
+import com.example.acceso.service.Interfaces.RedSocialService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

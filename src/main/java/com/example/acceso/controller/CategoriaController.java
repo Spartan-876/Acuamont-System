@@ -1,7 +1,8 @@
 package com.example.acceso.controller;
 
 import com.example.acceso.model.Categoria;
-import com.example.acceso.service.CategoriaService;
+import com.example.acceso.service.Implements.CategoriaServiceImpl;
+import com.example.acceso.service.Interfaces.CategoriaService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

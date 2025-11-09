@@ -1,7 +1,8 @@
-package com.example.acceso.service;
+package com.example.acceso.service.Implements;
 
 import com.example.acceso.model.Cliente;
 import com.example.acceso.repository.ClienteRepository;
+import com.example.acceso.service.Interfaces.ClienteService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +18,7 @@ import java.util.Optional;
  * validaciones y transacciones.
  */
 @Service
-public class ClienteService {
+public class ClienteServiceImpl implements ClienteService {
 
     private final ClienteRepository clienteRepository;
 
@@ -27,7 +28,7 @@ public class ClienteService {
      * @param clienteRepository El repositorio para las operaciones de base de datos
      *                          de Cliente.
      */
-    public ClienteService(ClienteRepository clienteRepository) {
+    public ClienteServiceImpl(ClienteRepository clienteRepository) {
         this.clienteRepository = clienteRepository;
     }
 

@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import com.example.acceso.model.Categoria;
 import com.example.acceso.repository.CategoriaRepository;
-import com.example.acceso.service.CategoriaService;
+import com.example.acceso.service.Implements.CategoriaServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ class CategoriaServiceTest {
     private CategoriaRepository categoriaRepository;
 
     @InjectMocks
-    private CategoriaService categoriaService;
+    private CategoriaServiceImpl categoriaService;
 
     private Categoria categoriaActiva;
     private Categoria categoriaInactiva;

@@ -1,7 +1,8 @@
-package com.example.acceso.service;
+package com.example.acceso.service.Implements;
 
 import com.example.acceso.model.Proveedor;
 import com.example.acceso.repository.ProveedorRepository;
+import com.example.acceso.service.Interfaces.ProveedorService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,11 +12,11 @@ import java.util.Optional;
 
 
 @Service
-public class ProveedorService {
+public class ProveedorServiceImpl implements ProveedorService {
 
     private final ProveedorRepository proveedorRepository;
     
-    public ProveedorService(ProveedorRepository proveedorRepository) {
+    public ProveedorServiceImpl(ProveedorRepository proveedorRepository) {
         this.proveedorRepository = proveedorRepository;
     }
 

@@ -2,8 +2,10 @@ package com.example.acceso.controller;
 
 import com.example.acceso.model.Categoria;
 import com.example.acceso.model.Producto;
-import com.example.acceso.service.CategoriaService;
-import com.example.acceso.service.ProductoService;
+import com.example.acceso.service.Implements.CategoriaServiceImpl;
+import com.example.acceso.service.Implements.ProductoServiceImpl;
+import com.example.acceso.service.Interfaces.CategoriaService;
+import com.example.acceso.service.Interfaces.ProductoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

@@ -1,8 +1,9 @@
-package com.example.acceso.service;
+package com.example.acceso.service.Implements;
 
 import com.example.acceso.DTO.RedSocialDTO;
 import com.example.acceso.model.RedSocial;
 import com.example.acceso.repository.RedSocialRepository;
+import com.example.acceso.service.Interfaces.RedSocialService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +17,7 @@ import java.util.Optional;
  * redes sociales que se muestran en el sitio web.
  */
 @Service
-public class RedSocialService {
+public class RedSocialServiceImpl implements RedSocialService {
 
     private final RedSocialRepository redSocialRepository;
 
@@ -27,7 +28,7 @@ public class RedSocialService {
      * @param redSocialRepository El repositorio para las operaciones de base de
      *                            datos de {@link RedSocial}.
      */
-    public RedSocialService(RedSocialRepository redSocialRepository) {
+    public RedSocialServiceImpl(RedSocialRepository redSocialRepository) {
         this.redSocialRepository = redSocialRepository;
     }
 

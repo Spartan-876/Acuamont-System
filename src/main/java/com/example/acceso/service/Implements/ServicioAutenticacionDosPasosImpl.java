@@ -1,5 +1,6 @@
-package com.example.acceso.service;
+package com.example.acceso.service.Implements;
 
+import com.example.acceso.service.Interfaces.ServicioAutenticacionDosPasos;
 import dev.samstevens.totp.code.*;
 import dev.samstevens.totp.exceptions.QrGenerationException;
 import dev.samstevens.totp.qr.QrData;
@@ -22,7 +23,7 @@ import org.springframework.stereotype.Service;
  * 3. Verificar los códigos TOTP ingresados por el usuario.
  */
 @Service
-public class ServicioAutenticacionDosPasos {
+public class ServicioAutenticacionDosPasosImpl implements ServicioAutenticacionDosPasos {
 
     /**
      * Genera un nuevo secreto aleatorio de 64 bits.

@@ -1,4 +1,4 @@
-package com.example.acceso.service;
+package com.example.acceso.service.Interfaces;
 
 import com.example.acceso.model.Perfil;
 import com.example.acceso.model.Opcion;

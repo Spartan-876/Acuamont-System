@@ -2,8 +2,8 @@ package com.example.acceso.controller;
 
 import com.example.acceso.model.Opcion;
 import com.example.acceso.model.Usuario;
-import com.example.acceso.service.ServicioAutenticacionDosPasos;
-import com.example.acceso.service.UsuarioService;
+import com.example.acceso.service.Interfaces.ServicioAutenticacionDosPasos;
+import com.example.acceso.service.Interfaces.UsuarioService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

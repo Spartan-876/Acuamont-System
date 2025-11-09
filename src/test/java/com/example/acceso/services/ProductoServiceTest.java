@@ -14,7 +14,7 @@ import java.util.Optional;
 
 import com.example.acceso.model.Producto;
 import com.example.acceso.repository.ProductoRepository;
-import com.example.acceso.service.ProductoService;
+import com.example.acceso.service.Implements.ProductoServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ class ProductoServiceTest {
     private ProductoRepository productoRepository;
 
     @InjectMocks
-    private ProductoService productoService;
+    private ProductoServiceImpl productoService;
 
     // JUnit 5 proveerá una carpeta temporal para las pruebas de archivos
     @TempDir

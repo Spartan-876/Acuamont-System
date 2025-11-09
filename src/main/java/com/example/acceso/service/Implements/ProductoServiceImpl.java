@@ -1,7 +1,8 @@
-package com.example.acceso.service;
+package com.example.acceso.service.Implements;
 
 import com.example.acceso.model.Producto;
 import com.example.acceso.repository.ProductoRepository;
+import com.example.acceso.service.Interfaces.ProductoService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ import java.util.UUID;
  * sobre las entidades de Producto, incluyendo la gestión de imágenes asociadas.
  */
 @Service
-public class ProductoService {
+public class ProductoServiceImpl implements ProductoService {
 
     /**
      * Directorio donde se subirán las imágenes de los productos.
@@ -40,7 +41,7 @@ public class ProductoService {
      * @param productoRepository El repositorio para las operaciones de base de
      *                           datos de Producto.
      */
-    public ProductoService(ProductoRepository productoRepository) {
+    public ProductoServiceImpl(ProductoRepository productoRepository) {
         this.productoRepository = productoRepository;
     }
 

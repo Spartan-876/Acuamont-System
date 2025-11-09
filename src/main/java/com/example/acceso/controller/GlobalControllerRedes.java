@@ -1,7 +1,8 @@
 package com.example.acceso.controller;
 
 import com.example.acceso.model.RedSocial;
-import com.example.acceso.service.RedSocialService;
+import com.example.acceso.service.Implements.RedSocialServiceImpl;
+import com.example.acceso.service.Interfaces.RedSocialService;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 

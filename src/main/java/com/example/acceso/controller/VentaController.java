@@ -4,7 +4,9 @@ import com.example.acceso.DTO.VentaDTO;
 import com.example.acceso.model.Cuota;
 import com.example.acceso.model.Pago;
 import com.example.acceso.model.Venta;
-import com.example.acceso.service.*;
+import com.example.acceso.service.Interfaces.FormaPagoService;
+import com.example.acceso.service.Interfaces.SerieComprobanteService;
+import com.example.acceso.service.Interfaces.VentaService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +43,7 @@ public class VentaController {
      *                                comprobantes.
      */
     public VentaController(VentaService ventaService, FormaPagoService formaPagoService,
-            SerieComprobanteService serieComprobanteService) {
+                           SerieComprobanteService serieComprobanteService) {
         this.ventaService = ventaService;
         this.formaPagoService = formaPagoService;
         this.serieComprobanteService = serieComprobanteService;
