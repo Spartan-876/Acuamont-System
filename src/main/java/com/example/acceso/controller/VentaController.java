@@ -5,8 +5,10 @@ import com.example.acceso.model.Cuota;
 import com.example.acceso.model.Pago;
 import com.example.acceso.model.Venta;
 import com.example.acceso.service.Interfaces.FormaPagoService;
+import com.example.acceso.service.Interfaces.GenerarBoletaService;
 import com.example.acceso.service.Interfaces.SerieComprobanteService;
 import com.example.acceso.service.Interfaces.VentaService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +32,8 @@ import java.util.Map;
 @RequestMapping("/ventas")
 public class VentaController {
 
+
+    private GenerarBoletaService generarBoletaService;
     private final VentaService ventaService;
     private final FormaPagoService formaPagoService;
     private final SerieComprobanteService serieComprobanteService;
@@ -43,7 +48,8 @@ public class VentaController {
      *                                comprobantes.
      */
     public VentaController(VentaService ventaService, FormaPagoService formaPagoService,
-                           SerieComprobanteService serieComprobanteService) {
+                           SerieComprobanteService serieComprobanteService,GenerarBoletaService generarBoletaService) {
+        this.generarBoletaService = generarBoletaService;
         this.ventaService = ventaService;
         this.formaPagoService = formaPagoService;
         this.serieComprobanteService = serieComprobanteService;
@@ -225,6 +231,41 @@ public class VentaController {
     public ResponseEntity<List<Pago>> listarPagosPorVenta(@PathVariable Long ventaId) {
         List<Pago> pagos = ventaService.obtenerPagosPorVenta(ventaId);
         return ResponseEntity.ok(pagos);
+    }
+
+    @GetMapping("/api/boleta/{ventaId}")
+    public void descargarBoletaPDF(@PathVariable Long ventaId, HttpServletResponse response) {
+        try {
+            byte[] pdfBytes = generarBoletaService.generarBoletaPdf(ventaId);
+            response.setContentType("application/pdf");
+            response.setHeader("Content-Disposition", "attachment; filename=\"boleta_" + ventaId + ".pdf\"");
+            OutputStream outputStream = response.getOutputStream();
+            outputStream.write(pdfBytes);
+            outputStream.flush();
+            outputStream.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/api/envio-correo/{ventaid}")
+    public ResponseEntity<?> enviarBoletaPorCorreo(@PathVariable Long ventaid) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            String correoEnviado = generarBoletaService.enviarBoletaPorCorreo(ventaid);
+            response.put("success", true);
+            response.put("message", "Boleta enviada exitosamente a: " + correoEnviado);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("success", false);
+            response.put("message", "Error al enviar correo: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
 
 }

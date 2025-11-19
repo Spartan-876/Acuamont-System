@@ -34,6 +34,8 @@ $(document).ready(function () {
         buscar_cliente: (documento) => `${API_CLIENTES}/buscar-cliente-documento/${documento}`,
         buscar_documento_externo: (documento) => `${API_CLIENTES}/buscar-documento/${documento}`,
         guardar_pago: `${API_PAGOS}/registrarPago`,
+        descargar_boleta: (id) => `${API_BASE}/boleta/${id}`,
+        enviar_correo: (id) => `${API_BASE}/envio-correo/${id}`,
     };
 
     // Inicializar Componentes
@@ -95,6 +97,12 @@ $(document).ready(function () {
                         if (data === 2) return '<span class="badge bg-danger">Anulado</span>';
                         return '';
                     }
+                },
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    render: (data, type, row) => createActionButtonsComprobante(row)
                 },
                 {
                     data: null,
@@ -189,6 +197,45 @@ $(document).ready(function () {
         return buttons;
     }
 
+    function createActionButtonsComprobante(row) {
+        let url = ENDPOINTS.descargar_boleta(row.id);
+        let url_Correo = ENDPOINTS.enviar_correo(row.id);
+        let verifiCorreo = row.cliente.correo != null && row.cliente.correo != '' ? true : false;
+
+        let buttons = `
+            <div class="d-flex gap-1">
+        `;
+
+        let button_pdf = `
+            <a 
+                href="${url}" 
+                class="btn btn-sm btn-danger"
+                title="Descargar Boleta">
+                    <i class="bi bi-file-earmark-pdf"></i>
+            </a>
+        `;
+
+        buttons += button_pdf;
+
+        if (verifiCorreo) {
+
+            let button_Email = `
+            <button 
+                    type="button"
+                    class="btn btn-sm btn-primary btn-enviar-correo" 
+                    data-url="${url_Correo}" 
+                    title="Enviar Correo">
+                        <i class="bi bi-envelope-at"></i>
+                </button>
+            `;
+            buttons += button_Email;
+        }
+
+        buttons += `</div>`;
+
+        return buttons;
+    };
+
     function setupEventListeners() {
         // Abrir modal para nueva venta
         $('#btnNuevoRegistro').on('click', openModalForNew);
@@ -198,6 +245,7 @@ $(document).ready(function () {
             saveVenta();
         });
 
+        $('#tablaVentas tbody').on('click', '.btn-enviar-correo', enviarCorrero);
         // Eventos de las tablas
         $('#tablaVentas tbody').on('click', '.action-eliminarVenta', eliminarVenta);
         $('#tablaVentas tbody').on('click', '.action-editarVenta', editarVenta);
@@ -261,6 +309,35 @@ $(document).ready(function () {
             }
         });
 
+    }
+
+    async function enviarCorrero(e) {
+        const boton = $(e.currentTarget);
+        const url = boton.data('url');
+        boton.prop('disabled', true);
+        boton.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
+
+        try {
+            const response = await fetch(url, {
+                method: 'GET'
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                showNotification(data.message, 'success');
+            } else {
+                throw new Error(data.message || 'Error desconocido al enviar');
+            }
+
+        } catch (error) {
+            console.error('Error al enviar correo:', error);
+            showNotification(error.message, 'error');
+
+        } finally {
+            boton.prop('disabled', false);
+            boton.html('<i class="bi bi-envelope-at"></i>');
+        }
     }
 
     function cargarUsuarioLogueado() {

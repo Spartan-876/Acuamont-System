@@ -2,8 +2,6 @@ package com.example.acceso.controller;
 
 import com.example.acceso.model.Usuario;
 import com.example.acceso.service.Interfaces.PerfilService;
-import com.example.acceso.service.Implements.ServicioAutenticacionDosPasosImpl;
-import com.example.acceso.service.Implements.UsuarioServiceImpl;
 import com.example.acceso.service.Interfaces.ServicioAutenticacionDosPasos;
 import com.example.acceso.service.Interfaces.UsuarioService;
 import jakarta.servlet.http.HttpSession;

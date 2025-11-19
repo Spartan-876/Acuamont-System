@@ -107,6 +107,12 @@
 			<version>9.1.22</version>
 		</dependency>
 
+		<!-- Email -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+
 		<!-- ArchUnit -->
 		<dependency>
 			<groupId>com.tngtech.archunit</groupId>

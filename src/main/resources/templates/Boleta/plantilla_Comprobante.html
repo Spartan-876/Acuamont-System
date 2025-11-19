@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Boleta de Venta</title>
+    <style type="text/css">
+        @page {
+            size: A4;
+            margin: 1.5cm;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            color: #333;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
+        }
+        .header h3 {
+            font-size: 24px;
+            margin: 0;
+            color: #000;
+        }
+        .header p {
+            margin: 2px 0;
+            font-size: 11px;
+            color: #555;
+        }
+
+        /* --- SECCIÓN DE INFORMACIÓN (CLIENTE Y BOLETA) --- */
+        .info-table {
+            width: 100%;
+            margin-bottom: 20px;
+            border-spacing: 0; /* Importante para el layout de tabla */
+        }
+        .info-table td {
+            width: 50%;
+            vertical-align: top;
+            padding: 5px;
+        }
+
+        /* Estilos para los datos de la boleta (derecha) */
+        .boleta-details {
+            text-align: right;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            padding: 10px;
+        }
+
+        /* Estilos para las etiquetas (Cliente:, Fecha:, etc.) */
+        .info-table strong {
+            display: block;
+            font-size: 11px;
+            color: #777;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+
+        /* Estilos para los datos (Nombre Cliente, N° Boleta, etc.) */
+        .info-table .data {
+            font-size: 14px;
+            font-weight: bold;
+            color: #000;
+        }
+
+        /* --- TABLA DE PRODUCTOS --- */
+        .tabla-items {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .tabla-items th {
+            background-color: #f2f2f2; /* Fondo gris claro para cabecera */
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+        .tabla-items td {
+            border: 1px solid #ddd; /* Bordes más suaves */
+            padding: 8px;
+        }
+
+        /* Rayas de cebra para las filas */
+        .tabla-items tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        /* Clases de alineación */
+        .text-right {
+            text-align: right;
+        }
+        .text-center {
+            text-align: center;
+        }
+
+        /* --- TOTALES --- */
+        .totales {
+            margin-top: 20px;
+            text-align: right;
+        }
+        .totales h4 {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 0;
+            padding: 12px;
+            background-color: #f2f2f2;
+            border: 1px solid #ddd;
+            display: inline-block; /* Hace que el fondo se ajuste al texto */
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h3>ACUAMONT S.A.C.</h3>
+    <p>RUC: 12345678901</p>
+    <p>Puerto de Palos 182</p>
+</div>
+
+<table class="info-table">
+    <tr>
+        <td class="info-cliente">
+            <strong>Cliente:</strong>
+            <span class="data" th:text="${venta.cliente.nombre}">Nombre del Cliente</span><br/><br/>
+            <strong>DNI/RUC:</strong>
+            <span class="data" th:text="${venta.cliente.documento}">12345678</span>
+        </td>
+
+        <td class="boleta-details">
+            <strong>Boleta de Venta Electrónica</strong>
+            <span class="data" th:text="${venta.serieComprobante.serie} + '-' + ${venta.correlativo}">B001-00123</span><br/><br/>
+            <strong>Fecha de Emisión:</strong>
+            <span class="data" th:text="${#temporals.format(venta.fecha, 'dd/MM/yyyy')}">05/11/2025</span>
+        </td>
+    </tr>
+</table>
+
+
+<table class="tabla-items">
+    <thead>
+    <tr>
+        <th>Producto</th>
+        <th class="text-center">Cantidad</th>
+        <th class="text-right">P. Unitario</th>
+        <th class="text-right">Subtotal</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="item : ${venta.detalleVentas}">
+        <td th:text="${item.producto.nombre}">Nombre Producto</td>
+        <td class="text-center" th:text="${item.cantidad}">2</td>
+        <td class="text-right" th:text="${'S/ ' + #numbers.formatDecimal(item.precioUnitario, 1, 'COMMA', 2, 'POINT')}">S/ 10.00</td>
+        <td class="text-right" th:text="${'S/ ' + #numbers.formatDecimal(item.subtotal, 1, 'COMMA', 2, 'POINT')}">S/ 20.00</td>
+    </tr>
+    </tbody>
+</table>
+
+<div class="totales">
+    <h4>Total: S/ <span th:text="${#numbers.formatDecimal(venta.total, 1, 'COMMA', 2, 'POINT')}">120.00</span></h4>
+</div>
+
+</body>
+</html>

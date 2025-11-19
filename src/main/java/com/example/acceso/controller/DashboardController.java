@@ -1,9 +1,5 @@
 package com.example.acceso.controller;
 
-import com.example.acceso.service.Implements.CategoriaServiceImpl;
-import com.example.acceso.service.Implements.ProductoServiceImpl;
-import com.example.acceso.service.Implements.UsuarioServiceImpl;
-import com.example.acceso.service.Implements.VentaServiceImpl;
 import com.example.acceso.service.Interfaces.CategoriaService;
 import com.example.acceso.service.Interfaces.ProductoService;
 import com.example.acceso.service.Interfaces.UsuarioService;

@@ -1,7 +1,6 @@
 package com.example.acceso.controller;
 
 import com.example.acceso.model.Cliente;
-import com.example.acceso.service.Implements.ClienteServiceImpl;
 import com.example.acceso.service.Interfaces.ClienteService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
