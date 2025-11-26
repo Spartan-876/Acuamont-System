@@ -18,9 +18,12 @@
 </head>
 <body>
     <div class="d-flex">
+        <!-- Sidebar -->
         <div th:replace="~{sidebar :: sidebar(activeUri='/slides/listar')}"></div>
 
+        <!-- Main content -->
         <main id="main-content" class="main-content w-100">
+            <!-- Top bar -->
             <header class="p-3 mb-3 border-bottom bg-white shadow-sm">
                 <div class="d-flex align-items-center">
                     <button id="open-sidebar" class="btn btn-light d-md-none me-3 p-1">
@@ -168,5 +171,7 @@
 <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 
 <script th:src="@{/js/slides.js}"></script>
+<script th:src="@{/js/main.js}"></script> <!-- Script común para sidebar -->
+
 </body>
 </html>
