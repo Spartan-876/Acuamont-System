@@ -18,6 +18,7 @@ $(document).ready(function () {
     const API_PRODUCTOS = '/productos/api';
     const API_PAGOS = '/pagos/api';
     const API_BASE = '/ventas/api';
+    const API_MIAPI = 'http://localhost:3001';
     const ENDPOINTS = {
         usuario: `${API_USUARIOS}/usuarioLogueado`,
         list: `${API_BASE}/listar`,
@@ -32,7 +33,7 @@ $(document).ready(function () {
         productos: `${API_PRODUCTOS}/listar`,
         guardar_cliente: `${API_CLIENTES}/guardar`,
         buscar_cliente: (documento) => `${API_CLIENTES}/buscar-cliente-documento/${documento}`,
-        buscar_documento_externo: (documento) => `${API_CLIENTES}/buscar-documento/${documento}`,
+        buscar_documento_externo: (documento) => `${API_MIAPI}${API_CLIENTES}/buscar-documento/${documento}`,
         guardar_pago: `${API_PAGOS}/registrarPago`,
         descargar_boleta: (id) => `${API_BASE}/boleta/${id}`,
         enviar_correo: (id) => `${API_BASE}/envio-correo/${id}`,
@@ -65,7 +66,7 @@ $(document).ready(function () {
                 { data: 'id' },
                 {
                     data: null,
-                    render: (data, type, row) => `${row.serieComprobante.serie}-${row.correlativo}`
+                    render: (data, type, row) => `${row.serieComprobante.serie}-${String(row.correlativo).padStart(9, '0')}`
                 },
                 { data: 'cliente.nombre' },
                 { data: 'usuario.nombre' },

@@ -3,13 +3,11 @@ package com.example.acceso.controller;
 import com.example.acceso.model.Cliente;
 import com.example.acceso.service.Interfaces.ClienteService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,27 +23,6 @@ import java.util.Map;
 @Controller
 @RequestMapping("/clientes")
 public class ClienteController {
-
-    /**
-     * Token de autorización para la API externa de consulta de documentos.
-     * Inyectado desde el archivo de propiedades.
-     */
-    @Value("${miapi.token}")
-    private String tokenCode;
-
-    /**
-     * URL base de la API externa para consultar DNI.
-     * Inyectado desde el archivo de propiedades.
-     */
-    @Value("${miapi.url.dni}")
-    private String urlDni;
-
-    /**
-     * URL base de la API externa para consultar RUC.
-     * Inyectado desde el archivo de propiedades.
-     */
-    @Value("${miapi.url.ruc}")
-    private String urlRuc;
 
     private final ClienteService clienteService;
 
@@ -199,54 +176,6 @@ public class ClienteController {
             response.put("success", false);
             response.put("message", "Error al eliminar el cliente: " + e.getMessage());
             return ResponseEntity.internalServerError().body(response);
-        }
-    }
-
-    /**
-     * Endpoint de la API para buscar información de una persona o empresa por su número de documento (DNI/RUC)
-     * utilizando un servicio externo.
-     *
-     * @param documento El número de DNI (8 dígitos) o RUC (11 dígitos).
-     * @return Un {@link ResponseEntity} con los datos encontrados o un mensaje de error.
-     */
-    @GetMapping("/api/buscar-documento/{documento}")
-    @ResponseBody
-    public ResponseEntity<?> buscarPorDocumento(@PathVariable String documento) {
-        String token = tokenCode;
-        String url;
-
-        if (documento.length() == 8) {
-            url = urlDni + documento;
-        } else if (documento.length() == 11) {
-            url = urlRuc + documento;
-        } else {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("success", false, "message", "Documento inválido"));
-        }
-
-        try {
-            RestTemplate restTemplate = new RestTemplate();
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + token);
-            HttpEntity<String> entity = new HttpEntity<>(headers);
-
-            ResponseEntity<Map> response = restTemplate.exchange(
-                    url,
-                    HttpMethod.GET,
-                    entity,
-                    Map.class
-            );
-
-            Map body = response.getBody();
-            if (body == null || !Boolean.TRUE.equals(body.get("success"))) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("success", false, "message", "No se encontró información para el documento ingresado"));
-            }
-
-            return ResponseEntity.ok(body);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("success", false, "message", "Error al consultar el documento: " + e.getMessage()));
         }
     }
 

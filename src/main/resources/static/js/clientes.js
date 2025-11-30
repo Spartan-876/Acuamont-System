@@ -4,13 +4,14 @@ $(document).ready(function () {
     let clienteModal;
 
     const API_BASE_URL = '/clientes/api';
+    const API_MIAPI='http://localhost:3001';
     const ENDPOINTS = {
         list: `${API_BASE_URL}/listar`,
         save: `${API_BASE_URL}/guardar`,
         get: (id) => `${API_BASE_URL}/${id}`,
         delete: (id) => `${API_BASE_URL}/eliminar/${id}`,
         toggleStatus: (id) => `${API_BASE_URL}/cambiar-estado/${id}`,
-        buscarDocumento: (dni) => `${API_BASE_URL}/buscar-documento/${dni}`
+        buscarDocumento: (dni) => `${API_MIAPI}${API_BASE_URL}/buscar-documento/${dni}`
     };
 
     initializeDataTable();

@@ -16,12 +16,11 @@ import java.util.List;
 public interface ReportesRepository extends JpaRepository<Venta,Long> {
     @Query(value = """
         SELECT 
-            CONCAT(sc.serie, '-', v.correlativo) AS documento,
+            CONCAT(sc.serie, '-', LPAD(v.correlativo, 9, '0')) AS documento,
             c.nombre AS cliente,
             v.fecha AS fecha,
             v.total AS totalVenta,
             SUM((dv.precio_unitario - p.precio_compra) * dv.cantidad) AS utilidad
-            
         FROM ventas v
         INNER JOIN clientes c ON v.id_cliente = c.id
         INNER JOIN series_comprobante sc ON v.id_serie_comprobante = sc.id
@@ -65,7 +64,7 @@ public interface ReportesRepository extends JpaRepository<Venta,Long> {
         INNER JOIN usuarios u ON v.id_usuario = u.id
         INNER JOIN detalle_venta dv ON v.id = dv.id_venta
         INNER JOIN productos p ON dv.id_producto = p.id
-        WHERE v.estado = 1
+        WHERE v.estado = 1 or v.estado = 0
         GROUP BY u.id, u.nombre
         ORDER BY utilidad DESC
         """, nativeQuery = true)
@@ -115,7 +114,7 @@ public interface ReportesRepository extends JpaRepository<Venta,Long> {
         INNER JOIN detalle_venta dv ON v.id = dv.id_venta
         INNER JOIN productos p ON dv.id_producto = p.id
         WHERE v.estado = 1 
-          AND v.fecha BETWEEN :inicio AND :fin
+        AND v.fecha BETWEEN :inicio AND :fin
         GROUP BY p.id, p.nombre
         ORDER BY utilidad DESC
         """, nativeQuery = true)

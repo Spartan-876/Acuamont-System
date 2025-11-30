@@ -3,13 +3,11 @@ package com.example.acceso.controller;
 import com.example.acceso.model.Proveedor;
 import com.example.acceso.service.Interfaces.ProveedorService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,12 +16,6 @@ import java.util.Map;
 @Controller
 @RequestMapping("/proveedores")
 public class ProveedorController {
-    
-    @Value("${miapi.token}")
-    private String tokenCode;
-
-    @Value("${miapi.url.ruc}")
-    private String urlRuc;
 
     private final ProveedorService proveedorService;
 
@@ -139,44 +131,6 @@ public class ProveedorController {
         }
     }
 
-    @GetMapping("/api/buscar-documento/{documento}")
-    @ResponseBody
-    public ResponseEntity<?> buscarPorDocumento(@PathVariable String documento) {
-        String token = tokenCode;
-        String url;
-
-        if (documento.length() == 11) {
-            url = urlRuc + documento;
-        } else {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("success", false, "message", "Documento inválido"));
-        }
-
-        try {
-            RestTemplate restTemplate = new RestTemplate();
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + token);
-            HttpEntity<String> entity = new HttpEntity<>(headers);
-
-            ResponseEntity<Map> response = restTemplate.exchange(
-                    url,
-                    HttpMethod.GET,
-                    entity,
-                    Map.class
-            );
-
-            Map body = response.getBody();
-            if (body == null || !Boolean.TRUE.equals(body.get("success"))) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("success", false, "message", "No se encontró información para el documento ingresado"));
-            }
-
-            return ResponseEntity.ok(body);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("success", false, "message", "Error al consultar el documento: " + e.getMessage()));
-        }
-    }
 
     @GetMapping("/api/buscar-proveedor-documento/{documento}")
     public ResponseEntity<?> buscarPorDocumentoInterno(@PathVariable String documento) {
