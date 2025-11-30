@@ -29,4 +29,5 @@ Diagrama de Clases.puml
 
 # Ignorar archivos de respaldo del editor
 *~
+### Archivos de configuración de entorno ###
 Servidores/ServidorMiapi/.env
