@@ -219,7 +219,21 @@ $(document).ready(function () {
     //Funciones para el carrito
     function agregarProducto(idProducto, cantidad = 1) {
         const prod = productos.find(p => p.id === idProducto);
+        if (!prod) return; // No debería pasar si la UI está correcta
+
         const existente = carrito.find(item => item.id === idProducto);
+        const cantidadEnCarrito = existente ? existente.cantidad : 0;
+        const nuevaCantidadTotal = cantidadEnCarrito + cantidad;
+
+        if (prod.stock === 0) {
+            showNotification(`${prod.nombre} está agotado y no se puede agregar al carrito.`, 'danger');
+            return;
+        }
+
+        if (nuevaCantidadTotal > prod.stock) {
+            showNotification(`Stock insuficiente. Solo quedan ${prod.stock} unidades de ${prod.nombre}.`, 'danger');
+            return;
+        }
 
         if (existente) {
             existente.cantidad += cantidad;
@@ -295,10 +309,18 @@ $(document).ready(function () {
     function actualizarCantidad(idProducto, cantidad) {
         const item = carrito.find(p => p.id === idProducto);
         if (item) {
-            item.cantidad = cantidad;
+            // El 'item' en el carrito ya tiene la propiedad 'stock' gracias al spread operator
+            if (cantidad > item.stock) {
+                showNotification(`Stock insuficiente. Solo quedan ${item.stock} unidades.`, 'danger');
+                // No se actualiza la cantidad, y al llamar a mostrarCarrito se revierte el valor en el input.
+            } else if (cantidad < 1) {
+                item.cantidad = 1; // Forzar a 1 si el valor es inválido (menor a 1)
+            } else {
+                item.cantidad = cantidad;
+            }
         }
         actualizarContadorCarrito();
-        mostrarCarrito(carrito);
+        mostrarCarrito(carrito); // Refresca la vista del carrito para mostrar el valor correcto
     }
 
     function limpiarCarrito() {

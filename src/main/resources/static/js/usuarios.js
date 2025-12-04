@@ -556,8 +556,10 @@ $(document).ready(function () {
      * Limpia todos los errores de campo
      */
     function clearFieldErrors() {
+        $('.form-control').removeClass('is-invalid');
         $('.invalid-feedback').text('');
-        $('#formUsuario .form-control').removeClass('is-invalid');
+        $('.invalid-feedback').removeClass('d-block');
+        $('.invalid-feedback').css('display', '');
     }
 
     /**

@@ -365,8 +365,10 @@ $(document).ready(function () {
     }
 
     function clearFieldErrors() {
+        $('.form-control').removeClass('is-invalid');
         $('.invalid-feedback').text('');
-        $('#formProveedor .form-control').removeClass('is-invalid');
+        $('.invalid-feedback').removeClass('d-block');
+        $('.invalid-feedback').css('display', '');
     }
 
     function showFieldError(fieldName, message) {

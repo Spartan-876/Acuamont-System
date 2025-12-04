@@ -467,8 +467,10 @@ $(document).ready(function () {
 
 
     function clearFieldErrors() {
-        $('.invalid-feedback').text('');
         $('.form-control').removeClass('is-invalid');
+        $('.invalid-feedback').text('');
+        $('.invalid-feedback').removeClass('d-block');
+        $('.invalid-feedback').css('display', '');
     }
 
     function showNotification(message, type = 'success') {

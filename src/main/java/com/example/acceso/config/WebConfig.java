@@ -136,7 +136,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "/PrincipalPage-web",
                         "/Servicios-web",
                         "/Productos-web",
-                        "/Contacto-web"
+                        "/Contacto-web",
+                        "/Comentarios-web"
                         );
 
     }

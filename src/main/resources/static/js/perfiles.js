@@ -344,6 +344,8 @@ $(document).ready(function() {
     function clearFieldErrors() {
         $('.form-control').removeClass('is-invalid');
         $('.invalid-feedback').text('');
+        $('.invalid-feedback').removeClass('d-block');
+        $('.invalid-feedback').css('display', '');
     }
 
     // Funciones de UI (notificaciones, loading) - Reutilizar o copiar de usuarios.js

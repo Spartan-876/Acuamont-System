@@ -138,4 +138,12 @@ public class DashboardController {
         return "Servicios-WEB";
     }
 
+    /**
+     * Muestra la página pública de "Comentarios".
+     *
+     * @return El nombre de la vista "Comentarios-WEB".
+     */
+    @GetMapping("/Comentarios-web")
+    public String mostrarPaginaComentarios(){return "Comentarios-WEB";}
+
 }

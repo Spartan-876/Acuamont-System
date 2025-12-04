@@ -302,8 +302,10 @@ $(document).ready(function () {
     }
 
     function clearFieldErrors() {
+        $('.form-control').removeClass('is-invalid');
         $('.invalid-feedback').text('');
-        $('#formCategoria .form-control').removeClass('is-invalid');
+        $('.invalid-feedback').removeClass('d-block');
+        $('.invalid-feedback').css('display', '');
     }
 
     function showNotification(message, type = 'success') {

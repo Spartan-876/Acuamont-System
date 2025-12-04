@@ -33,6 +33,7 @@
         <li class="nav-item"><a th:href="@{/Servicios-web}" class="nav-link">Servicios</a></li>
         <li class="nav-item"><a th:href="@{/Productos-web}" class="nav-link">Productos</a></li>
         <li class="nav-item"><a th:href="@{/Contacto-web}" class="nav-link active">Contacto</a></li>
+        <li class="nav-item"><a th:href="@{/Comentarios-web}" class="nav-link">Comentarios</a></li>
     </ul>
 </div>
 
@@ -45,7 +46,7 @@
                         <h3 class="fw-bold border-bottom border-3 border-black">Redes Sociales</h3>
                         <div class="col mt-3">
                             <div th:each="red : ${redesSocialesActivas}" class="row border-0 rounded my-3">
-                                <a class="btn text-white ms-5 w-auto shadow" style="background-color: #061748"
+                                <a class="btn text-white ms-3 w-auto shadow" style="background-color: #061748"
                                     th:href="${red.url}"
                                     target="_blank"
                                     rel="noopener noreferrer">
@@ -67,7 +68,7 @@
                 </div>
                 <div class="col-lg-9">
                     <div class="p-4 rounded-4 bg-primary-light h-100 text-start">
-                        <h3 class="fw-bold border-bottom border-3 border-black">Mandanos un correo</h3>
+                        <h3 class="fw-bold border-bottom border-3 border-black">Contáctanos y cuentanos tu idea</h3>
                         <form action="https://formsubmit.co/johnchm007@gmail.com" method="post">
                             <div class="mb-3">
                                 <label for="nombre" class="form-label">Nombre completo</label>

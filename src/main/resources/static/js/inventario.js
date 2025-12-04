@@ -560,7 +560,9 @@ $(document).ready(function () {
 
     function clearFieldErrors() {
         $('.form-control').removeClass('is-invalid');
-        $('.invalid-feedback').hide();
+        $('.invalid-feedback').text('');
+        $('.invalid-feedback').removeClass('d-block');
+        $('.invalid-feedback').css('display', '');
     }
 
 });

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="icon" src="/iconos/logo1.png" type="image/x-icon">
+    <link rel="stylesheet"  th:href="@{/css/header-footer-WEB.css}">
+
+    <title>Comentarios</title>
+</head>
+<body>
+
+    <div>
+    <header>
+        <div class="container-fluid p-3 d-flex text-white text-center align-items-center justify-content-center imagen-logo">
+            <h1 class="me-3 ms-3 mb-0">ACUAMONT</h1>
+            <a th:href="@{/PrincipalPage-web}" >
+                <img class="rounded-circle img-fluid w-50 h-auto"  th:src="@{/iconos/logo2.jpg}" id="logo" alt="Acuamont logo">
+            </a>
+        </div>
+    </header>
+</div>
+    <div class="container shadow bg-white sticky-top m-auto mt-3 navbar-custom" >
+    <ul class="nav nav-pills d-flex justify-content-center py-3 gap-1" >
+        <li class="nav-item"><a th:href="@{/PrincipalPage-web}" class="nav-link">Inicio</a></li>
+        <li class="nav-item"><a th:href="@{/Servicios-web}" class="nav-link">Servicios</a></li>
+        <li class="nav-item"><a th:href="@{/Productos-web}" class="nav-link">Productos</a></li>
+        <li class="nav-item"><a th:href="@{/Contacto-web}" class="nav-link">Contacto</a></li>
+        <li class="nav-item"><a th:href="@{/Comentarios-web}" class="nav-link active">Comentarios</a></li>
+    </ul>
+</div>
+
+    <div class="container-fluid mt-5 p-0">
+        <div class="container-md">
+            <div class="row g-3">
+                <!-- Columna del Formulario -->
+                <div class="col-lg-3">
+                    <div class="p-4 bg-white shadow border rounded">
+                        <h4 class="fw-bold border-bottom border-2 border-black pb-2 mb-4">Cuentanos tu experiencia</h4>
+                        <form id="comment-form" action="" method="">
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label">Nombre completo</label>
+                                <input type="text" name="Nombres" class="form-control" id="nombre" placeholder="nombres y apellidos" pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+">
+                                <div id="nombre-error" class="invalid-feedback d-block"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="mensaje" class="form-label">Comentario</label>
+                                <textarea class="form-control" name="Mensaje" id="mensaje" rows="5" placeholder="Escribe tu experiencia..."></textarea>
+                                <div id="mensaje-error" class="invalid-feedback d-block"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="imagen" class="form-label">Sube una imagen (opcional)</label>
+                                <input class="form-control" name="imagen" id="imagen" type="file">
+                            </div>
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn text-white" style="background-color:#061748">Enviar Comentario</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Columna de Comentarios -->
+                <div class="col-lg-9">
+                    <div class="container-md p-5 mb-5 bg-white shadow border rounded">
+                        <h3 class="fw-bold border-bottom border-3 border-black mb-4">Comentarios de nuestros clientes</h3>
+                        <div id="lista-comentarios" class="row g-4">
+                            <!-- Los comentarios se cargarán aquí dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid bg-white shadow-top mt-5">
+    <footer class=" py-3 mt-4 border-top">
+        <div class="container-fluid row  ">
+            <div class="col-md-4 align-content-start me-auto ">
+                <span class="mb-0 text-body-secondary">Acuamont</span>
+            </div>
+            <ul class="nav col-md-4 justify-content-end list-unstyled align-content-end">
+                <li class="ms-2 me-2" >
+                    <p class="mb-0">Redes: </p>
+                </li>
+                <li th:each="red : ${redesSocialesActivas}" class="ms-2 me-2">
+                    <a class="text-body-secondary"
+                       th:href="${red.url}"
+                       th:aria-label="${red.nombre}"
+                       target="_blank"
+                       rel="noopener noreferrer">
+
+                        <i th:class="${red.icono}"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="text-center mt-4 pt-4 border-top border-secondary border-2">
+            <p class="mb-0">© 2025. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+</div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script th:src="@{/js/comentarios-web.js}"></script>
+</body>
+</html>
