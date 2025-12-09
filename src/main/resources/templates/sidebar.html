@@ -9,8 +9,8 @@
 -->
 <div th:fragment="sidebar(activeUri)">
     <div id="sidebar-overlay" class="sidebar-overlay"></div>
-    <nav id="sidebar" class="sidebar d-flex flex-column flex-shrink-0 p-3 text-white" style="background-color: #061748">
-        <div class="d-flex align-items-center justify-content-between mb-3">
+    <nav id="sidebar" class="sidebar d-flex flex-column flex-shrink-0 p-2 text-white" style="background-color: #061748">
+        <div class="d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center justify-content-center">
                 <a th:href="@{/}" class="fs-4 text-white text-decoration-none fw-bold">Sistema Acuamont</a>
                 <img th:src="@{/iconos/logo2.jpg}" alt="acuamont"
@@ -25,7 +25,7 @@
         <ul class="nav nav-pills flex-column mb-auto">
             <li th:each="opcion : ${session.menuOpciones}">
                 <a th:href="@{${opcion.ruta}}"
-                    class="nav-link text-white rounded-lg"
+                    class="nav-link text-white rounded-lg my-1"
                     th:classappend="${opcion.ruta == activeUri} ? 'active' : ''">
                     <i th:class="${opcion.icono}"></i>
                     <span th:text="${opcion.nombre}"></span>
@@ -34,8 +34,8 @@
         </ul>
         <hr>
         <ul class="nav nav-pills flex-column">
-            <li><a th:href="@{/PrincipalPage-web}" class="nav-link text-white rounded-lg btn btn-success mb-2">Pagina Web</a></li>
-            <li><a th:href="@{/logout}" class="nav-link text-white rounded-lg btn btn-danger">Cerrar Sesión</a></li>
+            <li><a th:href="@{/PrincipalPage-web}" class="text-white rounded-lg btn btn-success mb-2 w-100">Pagina Web</a></li>
+            <li><a th:href="@{/logout}" class="text-white rounded-lg btn btn-danger w-100">Cerrar Sesión</a></li>
         </ul>
     </nav>
 </div>

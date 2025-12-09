@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
 
 import com.example.acceso.model.Producto;
@@ -26,6 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Pruebas del Servicio ProductoService")
@@ -124,7 +126,7 @@ class ProductoServiceTest {
         });
 
         // When
-        Producto guardado = productoService.guardarProducto(producto, mockFotoFile);
+        Producto guardado = productoService.guardarProducto(producto, (List<MultipartFile>) mockFotoFile);
 
         // Then
         assertThat(guardado).isNotNull();
@@ -153,7 +155,7 @@ class ProductoServiceTest {
         when(productoRepository.save(any(Producto.class))).thenReturn(producto);
 
         // When
-        Producto actualizado = productoService.guardarProducto(producto, mockFotoFile);
+        Producto actualizado = productoService.guardarProducto(producto, (List<MultipartFile>) mockFotoFile);
 
         // Then
         assertThat(actualizado.getImagen()).isNotNull();

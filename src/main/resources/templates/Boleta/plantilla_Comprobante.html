@@ -136,7 +136,7 @@
 
         <td class="boleta-details">
             <strong>Boleta de Venta Electrónica</strong>
-            <span class="data" th:text="${venta.serieComprobante.serie} + '-' + ${venta.correlativo}">B001-00123</span><br/><br/>
+            <span class="data" th:text="${venta.serieComprobante.serie} + '-' + ${#numbers.formatDecimal(venta.correlativo, 9, 0, 'POINT')}">B001-00123</span><br/><br/>
             <strong>Fecha de Emisión:</strong>
             <span class="data" th:text="${#temporals.format(venta.fecha, 'dd/MM/yyyy')}">05/11/2025</span>
         </td>

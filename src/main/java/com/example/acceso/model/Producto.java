@@ -44,9 +44,9 @@ public class Producto {
     @Column(nullable = false)
     private Integer stockSeguridad;
 
-    @Column(length = 255)
+    @Column(columnDefinition = "TEXT")
     private String imagen;
-
+    
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_categoria")
     private Categoria categoria;

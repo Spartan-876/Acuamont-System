@@ -28,10 +28,13 @@ public class ProductoController {
     private final CategoriaService categoriaService;
 
     /**
-     * Constructor para la inyección de dependencias de los servicios de producto y categoría.
+     * Constructor para la inyección de dependencias de los servicios de producto y
+     * categoría.
      *
-     * @param productoService  El servicio que maneja la lógica de negocio de los productos.
-     * @param categoriaService El servicio que maneja la lógica de negocio de las categorías.
+     * @param productoService  El servicio que maneja la lógica de negocio de los
+     *                         productos.
+     * @param categoriaService El servicio que maneja la lógica de negocio de las
+     *                         categorías.
      */
     public ProductoController(ProductoService productoService, CategoriaService categoriaService) {
         this.productoService = productoService;
@@ -83,9 +86,11 @@ public class ProductoController {
 
     /**
      * Endpoint de la API para guardar o actualizar un producto.
-     * Este método maneja datos de formulario multipart, incluyendo una imagen opcional.
+     * Este método maneja datos de formulario multipart, incluyendo una imagen
+     * opcional.
      *
-     * @param id             El ID del producto a actualizar (opcional, nulo para creación).
+     * @param id             El ID del producto a actualizar (opcional, nulo para
+     *                       creación).
      * @param nombre         El nombre del producto.
      * @param descripcion    La descripción del producto.
      * @param precioCompra   El precio de compra del producto.
@@ -107,8 +112,7 @@ public class ProductoController {
             @RequestParam("stock") Integer stock,
             @RequestParam("stockSeguridad") Integer stockSeguridad,
             @RequestParam("id_categoria") Long categoriaId,
-            @RequestParam(value = "imagen", required = false) MultipartFile imagen
-    ) {
+            @RequestParam(value = "imagenes", required = false) List<MultipartFile> imagenes) {
         Map<String, Object> response = new HashMap<>();
         try {
             Producto producto;
@@ -133,11 +137,12 @@ public class ProductoController {
                     .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada"));
             producto.setCategoria(categoria);
 
-            Producto productoGuardado = productoService.guardarProducto(producto, imagen);
+            Producto productoGuardado = productoService.guardarProducto(producto, imagenes);
 
             response.put("success", true);
             response.put("producto", productoGuardado);
-            response.put("message", id != null ? "Producto actualizado correctamente" : "Producto creado correctamente");
+            response.put("message",
+                    id != null ? "Producto actualizado correctamente" : "Producto creado correctamente");
 
             return ResponseEntity.ok(response);
 
@@ -152,12 +157,12 @@ public class ProductoController {
         }
     }
 
-
     /**
      * Endpoint de la API para obtener un producto por su ID.
      *
      * @param id El ID del producto a obtener.
-     * @return Un {@link ResponseEntity} con los datos del producto o un estado 404 si no se encuentra.
+     * @return Un {@link ResponseEntity} con los datos del producto o un estado 404
+     *         si no se encuentra.
      */
     @GetMapping("/api/{id}")
     @ResponseBody
@@ -208,7 +213,8 @@ public class ProductoController {
      * Endpoint de la API para cambiar el estado (activo/inactivo) de un producto.
      *
      * @param id El ID del producto cuyo estado se va a cambiar.
-     * @return Un {@link ResponseEntity} con el producto actualizado o un error si no se encuentra.
+     * @return Un {@link ResponseEntity} con el producto actualizado o un error si
+     *         no se encuentra.
      */
     @PostMapping("/api/cambiar-estado/{id}")
     @ResponseBody
@@ -231,6 +237,27 @@ public class ProductoController {
             response.put("success", false);
             response.put("message", "Error al cambiar el estado del producto: " + e.getMessage());
             return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    @DeleteMapping("/api/eliminar-imagen/{productoId}/{nombreImagen}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> eliminarImagen(@PathVariable Long productoId,
+            @PathVariable String nombreImagen) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            productoService.eliminarImagen(productoId, nombreImagen);
+            response.put("success", true);
+            response.put("message", "Imagen eliminada correctamente");
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error al eliminar la imagen: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 

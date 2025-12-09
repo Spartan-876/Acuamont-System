@@ -64,18 +64,15 @@ app.post("/comentarios", upload.single("imagen"), async (req, res) => {
     try {
         const { nombre, comentario } = req.body;
         
-        // Validar datos básicos
         if (!nombre || !comentario) {
             return res.status(400).json({ error: "Nombre y comentario son obligatorios" });
         }
 
-        // Construir URL de la imagen (si existe)
         let imagenUrl = null;
         if (req.file) {
             imagenUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
         }
 
-        // Insertar en BD
         const [result] = await db.query(
             "INSERT INTO comentarios (nombre, comentario, imagen_url) VALUES (?, ?, ?)",
             [nombre, comentario, imagenUrl]

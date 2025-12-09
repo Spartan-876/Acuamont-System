@@ -2,8 +2,9 @@
 $(document).ready(function () {
     // Variables globales
     let dataTable;
-    let isEditing = false;
     let productoModal;
+    let existingImageFiles = [];
+    let newImageFiles = [];
 
     // Configuración inicial
     const API_BASE = '/productos/api';
@@ -12,6 +13,7 @@ $(document).ready(function () {
         save: `${API_BASE}/guardar`,
         get: (id) => `${API_BASE}/${id}`,
         delete: (id) => `${API_BASE}/eliminar/${id}`,
+        deleteImage: (productoId, nombreImagen) => `${API_BASE}/eliminar-imagen/${productoId}/${nombreImagen}`,
         categorias: `${API_BASE}/categorias`,
         toggleStatus: (id) => `${API_BASE}/cambiar-estado/${id}`,
     };
@@ -38,7 +40,20 @@ $(document).ready(function () {
                 { data: 'id' },
                 {
                     data: 'imagen', render: function (data, type, row) {
-                        return `<img src="/Fotos-Productos/${data}" class="rounded-3 w-100 h-100 img-fluid">`;
+                        let imageUrl = 'https://placehold.co/150';
+                        if (data) {
+                            try {
+                                const images = JSON.parse(data);
+                                if (Array.isArray(images) && images.length > 0) {
+                                    imageUrl = `/Fotos-Productos/${row.id}/${images[0]}`;
+                                }
+                            } catch (e) {
+                                if (data && data !== "[]") {
+                                    imageUrl = `/Fotos-Productos/${row.id}/${data}`;
+                                }
+                            }
+                        }
+                        return `<img src="${imageUrl}" class="rounded-3" style="width: 60px; height: 60px; object-fit: cover;">`;
                     }
                 },
                 { data: 'nombre' },
@@ -98,8 +113,8 @@ $(document).ready(function () {
             language: {
                 url: 'https://cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
             },
-            pageLength: 10,
-            lengthMenu: [10, 25, 50],
+            pageLength: 5,
+            lengthMenu: [5,10, 25, 50],
             dom: 'lBfrtip',
             buttons: [
                 {
@@ -160,7 +175,6 @@ $(document).ready(function () {
             ? '<i class="bi bi-eye-slash-fill"></i>'
             : '<i class="bi bi-eye-fill"></i>';
 
-        const statusClass = row.estado === 1 ? 'action-btn-status-deactivate' : 'action-btn-status-activate';
         const statusTitle = row.estado === 1 ? 'Desactivar' : 'Activar';
 
         return `
@@ -179,21 +193,14 @@ $(document).ready(function () {
     }
 
     function setupEventListeners() {
-        // Botón nuevo registro
         $('#btnNuevoRegistro').on('click', openModalForNew);
-
-        // No es necesario un listener para cerrar el modal, Bootstrap lo maneja con data-bs-dismiss
-
-        // Submit form
-        $('#formProducto').on('submit', function (e) {
-            e.preventDefault();
-            saveProducto();
-        });
-
-        // Eventos de la tabla (delegados)
+        $('#formProducto').on('submit', saveProducto);
         $('#tablaProductos tbody').on('click', '.action-edit', handleEdit);
         $('#tablaProductos tbody').on('click', '.action-status', handleToggleStatus);
         $('#tablaProductos tbody').on('click', '.action-delete', handleDelete);
+        $('#imagenPreviewContainer').on('click', '.action-delete-image', handleDeleteImage);
+        $('#imagenPreviewContainer').on('click', '.action-remove-new-image', handleRemoveNewImage);
+        $('#imagenes').on('change', handleFilePreview);
     }
 
     function loadProductos() {
@@ -219,102 +226,174 @@ $(document).ready(function () {
             });
     }
 
-    function saveProducto() {
+    function saveProducto(e) {
+        e.preventDefault();
         const form = document.getElementById("formProducto");
         const formData = new FormData(form);
 
+        formData.delete('imagenes');
+
+        newImageFiles.forEach(file => {
+            formData.append('imagenes', file);
+        });
+
         if (!validateForm(formData)) return;
 
+        showLoading(true);
         fetch(ENDPOINTS.save, {
             method: "POST",
             body: formData
-        })
+        }
+        )
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     showNotification(data.message, "success");
-
-                    // Ocultar el modal
-                    const modal = bootstrap.Modal.getInstance(document.getElementById("productoModal"));
-                    modal.hide();
-
-                    // Limpiar formulario e imagen preview
-                    form.reset();
-                    document.getElementById("imagenPreview").src = "https://via.placeholder.com/150";
-
-                    // Recargar DataTable
-                    if (dataTable) {
-                        dataTable.ajax.reload(null, false); // false para no reiniciar la paginación
-                    }
+                    productoModal.hide();
+                    dataTable.ajax.reload(null, false);
                 } else {
-                    showNotification(data.message, "error");
+                    handleSaveError(data);
                 }
             })
             .catch(error => {
                 console.error("Error:", error);
                 showNotification("Error al guardar el producto", "error");
-            });
+            })
+            .finally(() => showLoading(false));
     }
 
-    // Previsualización de la imagen antes de subir
-    document.getElementById("imagen").addEventListener("change", function (event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                document.getElementById("imagenPreview").src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        } else {
-            document.getElementById("imagenPreview").src = "https://via.placeholder.com/150";
+    function renderImagePreviews() {
+        const container = $('#imagenPreviewContainer');
+        container.empty();
+        const productoId = $('#id').val();
+        const productoNombre = $('#nombre').val();
+
+        const allImagesCount = existingImageFiles.length + newImageFiles.length;
+
+        if (allImagesCount === 0) {
+            container.append('<p class="text-muted">No hay imágenes para mostrar.</p>');
+            return;
         }
-    });
+
+        existingImageFiles.forEach(imageName => {
+            const fullUrl = `/Fotos-Productos/${productoId}/${imageName}`;
+            const preview = $(`
+                <div class="position-relative d-inline-block m-1">
+                    <img src="${fullUrl}" class="rounded-3" style="width: 150px; height: 150px; object-fit: cover;" alt="Imagen de producto">
+                    <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 action-delete-image"
+                            data-imagen-nombre="${imageName}" data-producto-id="${productoId}" title="Eliminar imagen permanentemente">
+                        <i class="bi bi-trash3-fill"></i>
+                    </button>
+                </div>
+            `);
+            container.append(preview);
+        });
+
+        newImageFiles.forEach((file, index) => {
+            const fullUrl = URL.createObjectURL(file);
+            const preview = $(`
+                <div class="position-relative d-inline-block m-1">
+                    <img src="${fullUrl}" class="rounded-3" style="width: 150px; height: 150px; object-fit: cover;" alt="Nueva imagen" onload="URL.revokeObjectURL(this.src)">
+                    <button type="button" class="btn btn-sm btn-warning position-absolute top-0 end-0 m-1 action-remove-new-image"
+                            data-file-index="${index}" title="Quitar esta imagen">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            `);
+            container.append(preview);
+        });
+    }
+
+
+    function handleFilePreview(event) {
+        const files = Array.from(event.target.files);
+        if (files.length > 0) {
+            files.forEach(file => {
+                if (!newImageFiles.some(f => f.name === file.name && f.size === file.size)) {
+                    newImageFiles.push(file);
+                }
+            });
+        }
+        renderImagePreviews();
+        $(event.target).val('');
+    }
+
+    function handleRemoveNewImage(e) {
+        const index = $(e.currentTarget).data('file-index');
+        newImageFiles.splice(index, 1);
+        renderImagePreviews();
+    }
 
 
     function handleEdit(e) {
         e.preventDefault();
         const id = $(this).data('id');
-
         showLoading(true);
-
         fetch(ENDPOINTS.get(id))
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Producto no encontrado');
-                }
+                if (!response.ok) throw new Error('Producto no encontrado');
                 return response.json();
             })
             .then(data => {
-                if (data.success) {
-                    openModalForEdit(data.data);
-                } else {
-                    showNotification('Error al cargar producto: ' + data.message, 'error');
-                }
+                if (data.success) openModalForEdit(data.data);
+                else showNotification('Error al cargar producto: ' + data.message, 'error');
             })
             .catch(error => {
                 console.error('Error:', error);
                 showNotification('Error al cargar los datos del producto', 'error');
             })
-            .finally(() => {
-                showLoading(false);
-            });
+            .finally(() => showLoading(false));
     }
 
+
+    function handleDeleteImage(e) {
+        const button = $(e.currentTarget);
+        const productoId = button.data('producto-id');
+        const nombreImagen = button.data('imagen-nombre');
+
+        Swal.fire({
+            title: '¿Eliminar esta imagen?',
+            text: "Esta acción no se puede revertir.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                showLoading(true);
+                fetch(ENDPOINTS.deleteImage(productoId, nombreImagen), { method: 'DELETE' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showNotification(data.message, 'success');
+                            existingImageFiles = existingImageFiles.filter(img => img !== nombreImagen);
+                            renderImagePreviews();
+                            dataTable.ajax.reload(null, false);
+                        } else {
+                            showNotification(data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al eliminar imagen:', error);
+                        showNotification('Error de conexión.', 'error');
+                    })
+                    .finally(() => showLoading(false));
+            }
+        });
+    }
 
     function handleToggleStatus(e) {
         e.preventDefault();
         const id = $(this).data('id');
-
         showLoading(true);
-
-        fetch(ENDPOINTS.toggleStatus(id), {
-            method: 'POST'
-        })
+        fetch(ENDPOINTS.toggleStatus(id), { method: 'POST' })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     showNotification(data.message, 'success');
-                    loadProductos(); // Recargar la tabla
+                    loadProductos();
                 } else {
                     showNotification('Error: ' + data.message, 'error');
                 }
@@ -323,17 +402,13 @@ $(document).ready(function () {
                 console.error('Error:', error);
                 showNotification('Error de conexión al cambiar estado', 'error');
             })
-            .finally(() => {
-                showLoading(false);
-            });
+            .finally(() => showLoading(false));
     }
 
 
     function handleDelete(e) {
         e.preventDefault();
-
         const id = $(this).data('id');
-
         Swal.fire({
             title: '¿Estás seguro?',
             text: "¡No podrás revertir esta acción!",
@@ -346,15 +421,12 @@ $(document).ready(function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 showLoading(true);
-
-                fetch(ENDPOINTS.delete(id), {
-                    method: 'DELETE'
-                })
+                fetch(ENDPOINTS.delete(id), { method: 'DELETE' })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
                             showNotification(data.message, 'success');
-                            loadProductos(); // Recargar la tabla
+                            loadProductos();
                         } else {
                             showNotification('Error: ' + data.message, 'error');
                         }
@@ -363,25 +435,20 @@ $(document).ready(function () {
                         console.error('Error:', error);
                         showNotification('Error de conexión al eliminar el producto', 'error');
                     })
-                    .finally(() => {
-                        showLoading(false);
-                    });
+                    .finally(() => showLoading(false));
             }
         });
     }
 
     function openModalForNew() {
-        isEditing = false;
         clearForm();
         $('#modalTitle').text('Agregar Producto');
-        showModal();
+        productoModal.show();
     }
 
     function openModalForEdit(producto) {
-        isEditing = true;
         clearForm();
         $('#modalTitle').text('Editar Producto');
-
         $('#id').val(producto.id);
         $('#nombre').val(producto.nombre);
         $('#descripcion').val(producto.descripcion);
@@ -389,28 +456,30 @@ $(document).ready(function () {
         $('#precio_venta').val(producto.precioVenta);
         $('#stock').val(producto.stock);
         $('#stock_seguridad').val(producto.stockSeguridad);
+        $('#id_categoria').val(producto.categoria.id);
 
-        // Previsualizar imagen existente
-        $('#imagenPreview').attr('src', producto.imagen ? producto.imagen : "https://via.placeholder.com/150");
-
-        showModal();
-    }
-
-
-    function showModal() {
+        if (producto.imagen) {
+            try {
+                const images = JSON.parse(producto.imagen);
+                existingImageFiles = Array.isArray(images) ? images : [images];
+            } catch (e) {
+                if (producto.imagen && producto.imagen !== "[]") {
+                    existingImageFiles = [producto.imagen];
+                }
+            }
+        }
+        renderImagePreviews();
         productoModal.show();
-    }
-
-    function hiddenModal() {
-        productoModal.hide();
-        clearForm();
     }
 
     function clearForm() {
         $('#formProducto')[0].reset();
+        $('#id').val('');
         $('#formProducto .form-control').removeClass('is-invalid');
         $('.invalid-feedback').text('');
-        isEditing = false;
+        existingImageFiles = [];
+        newImageFiles = [];
+        renderImagePreviews();
     }
 
     function validateForm(formData) {
@@ -424,7 +493,6 @@ $(document).ready(function () {
         const precioVenta = Number(formData.get("precioVenta"));
         const stock = Number(formData.get("stock"));
         const stockSeguridad = Number(formData.get("stockSeguridad"));
-        const imagen = formData.get("imagen");
         const categoriaId = formData.get("id_categoria");
 
         if (!nombre || nombre.length < 2) {
@@ -466,6 +534,15 @@ $(document).ready(function () {
     }
 
 
+    function handleSaveError(data) {
+        showNotification(data.message || 'Error al guardar.', 'error');
+        if (data.errors) {
+            Object.entries(data.errors).forEach(([field, message]) => {
+                showFieldError(field, message);
+            });
+        }
+    }
+
     function clearFieldErrors() {
         $('.form-control').removeClass('is-invalid');
         $('.invalid-feedback').text('');
@@ -477,12 +554,12 @@ $(document).ready(function () {
         const toastClass = type === 'success' ? 'text-bg-success' : 'text-bg-danger';
 
         const notification = $(`
-            <div class="toast align-items-center ${toastClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast align-items-center ${toastClass} border-0" >
                 <div class="d-flex">
                     <div class="toast-body">
                         ${message}
                     </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" ></button>
                 </div>
             </div>
         `);

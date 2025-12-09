@@ -65,7 +65,8 @@ public class GenerarBoletaServiceImpl implements GenerarBoletaService {
         }
 
         String correoCliente = venta.getCliente().getCorreo();
-        String numeroBoleta = venta.getSerieComprobante().getSerie() + "-" + venta.getCorrelativo();
+        String correlativoFormateado = String.format("%09d", venta.getCorrelativo());
+        String numeroBoleta = venta.getSerieComprobante().getSerie() + "-" + correlativoFormateado;
 
         Context context = new Context();
         context.setVariable("venta", venta);

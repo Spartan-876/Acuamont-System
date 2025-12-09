@@ -1,5 +1,6 @@
 package com.example.acceso.controller;
 
+import com.example.acceso.model.Venta;
 import com.example.acceso.service.Interfaces.CategoriaService;
 import com.example.acceso.service.Interfaces.ProductoService;
 import com.example.acceso.service.Interfaces.UsuarioService;
@@ -64,6 +65,9 @@ public class DashboardController {
         BigDecimal totalVentasDia = ventaService.totalVentasDelDia();
         BigDecimal totalVentasMes = ventaService.totalVentasDelMes();
         BigDecimal totalDeuda = ventaService.totalDeuda();
+        List<Venta> cuentasPorCobrar = ventaService.listarCuentasPorCobrarPendientes();
+        List<Object[]> topProductos = productoService.findTop5ProductosMasVendidos();
+
 
         model.addAttribute("totalUsuarios", totalUsuarios);
 
@@ -76,6 +80,10 @@ public class DashboardController {
         model.addAttribute("totalVentasMes",totalVentasMes);
 
         model.addAttribute("totalDeuda",totalDeuda);
+
+        model.addAttribute("cuentasPorCobrar", cuentasPorCobrar);
+
+        model.addAttribute("topProductos", topProductos);
 
         return "index";
     }

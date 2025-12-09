@@ -376,4 +376,9 @@ public class VentaServiceImpl implements VentaService {
         return ventaRepository.sumTotalDeuda();
     }
 
+    @Override
+    public List<Venta> listarCuentasPorCobrarPendientes() {
+        return ventaRepository.findAllByEstado(0);
+    }
+
 }

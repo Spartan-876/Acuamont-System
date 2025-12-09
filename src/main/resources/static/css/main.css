@@ -1,8 +1,3 @@
-/*
- * Hoja de estilos principal para la aplicación Acceso.
- * Archivo: src/main/resources/static/css/main.css
- */
-
 body {
     background-color: #f8f9fa;
     font-family: 'Inter', sans-serif;
@@ -81,4 +76,16 @@ body {
 #sidebar .nav-pills .nav-link.active {
     background-color: #fff !important;
     color: #000 !important;
+    font-weight: 600;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+#sidebar .nav-pills .nav-link:not(.active):hover {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    color: #fff !important;
+    transform: translateX(5px);
+}
+
+#sidebar .nav-pills .nav-link {
+    transition: all 0.3s ease;
 }

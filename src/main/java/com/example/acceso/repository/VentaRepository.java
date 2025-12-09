@@ -75,4 +75,6 @@ public interface VentaRepository extends JpaRepository<Venta, Long> {
     @Query("SELECT COALESCE(SUM(v.deuda), 0) FROM Venta v WHERE v.estado <> 2")
     BigDecimal sumTotalDeuda();
 
+    List<Venta> findAllByEstado(Integer estado);
+
 }

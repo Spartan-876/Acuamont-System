@@ -201,7 +201,25 @@ $(document).ready(function () {
     function createActionButtonsComprobante(row) {
         let url = ENDPOINTS.descargar_boleta(row.id);
         let url_Correo = ENDPOINTS.enviar_correo(row.id);
-        let verifiCorreo = row.cliente.correo != null && row.cliente.correo != '' ? true : false;
+        let verifiCorreo = row.cliente.correo != null && row.cliente.correo != '';
+        let verifiNumero= row.cliente.telefono != null && row.cliente.telefono !='';
+        let nombre = row.cliente.nombre;
+        let telefono = row.cliente.telefono;
+        let documento = `${row.serieComprobante.serie}-${String(row.correlativo).padStart(9, '0')}`;
+        let fecha   = new Date(row.fecha).toLocaleString('es-PE');
+        let total = row.total;
+
+        let mensaje = `Hola *${nombre}*, gracias por su compra en *Acuamont*.\n\n`;
+        mensaje += `*COMPRA CONFIRMADA*\n`;
+        mensaje += `#############################\n`;
+        mensaje += `*Boleta:* ${documento}\n`;
+        mensaje += `*Fecha:* ${fecha}\n`;
+        mensaje += `*TOTAL:* S/ ${total}\n`;
+        mensaje += `#############################\n`;
+        mensaje += `¡Esperamos verlo pronto!`;
+
+        let mensajeCodificado = encodeURIComponent(mensaje);
+
 
         let buttons = `
             <div class="d-flex gap-1">
@@ -230,6 +248,22 @@ $(document).ready(function () {
                 </button>
             `;
             buttons += button_Email;
+        }
+
+        if (verifiNumero){
+
+            let Url_wsp = `https://wa.me/51${telefono}?text=${mensajeCodificado}`;
+
+            let button_telefono=`
+            <a 
+                    class="btn btn-sm btn-success btn-enviar-whatssapp" 
+                    target="_blank"
+                    href="${Url_wsp}"
+                    title="Enviar Resumen por WhatsApp">
+                        <i class="bi bi-whatsapp"></i>
+                </a>
+            `;
+            buttons += button_telefono;
         }
 
         buttons += `</div>`;
@@ -974,6 +1008,7 @@ $(document).ready(function () {
                         <td>S/ ${pago.montoPagado?.toFixed(2) || '0.00'}</td>
                         <td>${estado}</td>
                         <td>${pago.metodoPago || 'N/A'}</td>
+                        <td>${pago.comentario || 'N/A'}</td>
                     </tr>
                 `;
                 tbody.append(row);

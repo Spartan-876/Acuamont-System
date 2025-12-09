@@ -22,12 +22,10 @@ public class Perfil {
     private String descripcion;
 
     @Column(nullable = false)
-    private boolean estado = true; // true: Activo, false: Inactivo
+    private int estado = 1;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "perfil_opcion", joinColumns = @JoinColumn(name = "id_perfil"), inverseJoinColumns = @JoinColumn(name = "id_opcion"))
-    // Ignora la serialización de 'opciones' en algunas respuestas para evitar
-    // bucles
     @JsonIgnoreProperties("perfiles")
     private Set<Opcion> opciones = new HashSet<>();
 
@@ -60,11 +58,11 @@ public class Perfil {
         this.descripcion = descripcion;
     }
 
-    public boolean isEstado() {
+    public int getEstado() {
         return estado;
     }
 
-    public void setEstado(boolean estado) {
+    public void setEstado(int estado) {
         this.estado = estado;
     }
 

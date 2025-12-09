@@ -10,7 +10,7 @@ public interface ProductoService {
 
     List<Producto> listarProductos();
 
-    Producto guardarProducto(Producto producto, MultipartFile fotoFile);
+    Producto guardarProducto(Producto producto, List<MultipartFile> fotos);
 
     long contarProductos();
 
@@ -22,5 +22,8 @@ public interface ProductoService {
 
     Optional<Producto> cambiarEstadoProducto(Long id);
 
+    void eliminarImagen(Long productoId, String nombreImagen);
+
+    List<Object[]> findTop5ProductosMasVendidos();
 
 }

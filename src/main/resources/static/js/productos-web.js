@@ -65,12 +65,27 @@ $(document).ready(function () {
 
         productos.forEach(prod => {
             const isAgotado = prod.stock === 0;
+            let imageUrl = 'https://placehold.co/150';
+            if (prod.imagen) {
+                try {
+                    const images = JSON.parse(prod.imagen);
+                    if (Array.isArray(images) && images.length > 0) {
+                        imageUrl = `/Fotos-Productos/${prod.id}/${images[0]}`;
+                    }
+                } catch (e) {
+                    // Fallback por si la imagen no es un JSON array
+                    if (prod.imagen && prod.imagen !== "[]") {
+                        imageUrl = `/Fotos-Productos/${prod.id}/${prod.imagen}`;
+                    }
+                }
+            }
+
             const productoCard = `
             <div class="col-12 col-sm-6 col-lg-3">
                 <div class="card h-100 card-rounded border-0 shadow overflow-hidden ${isAgotado ? 'agotado-card' : ''}">
                     ${isAgotado ? '<span class="badge bg-danger text-white position-absolute top-50 start-50 translate-middle fs-5 z-1">Agotado</span>' : ''}
                     <div class="ratio ratio-4x3">
-                    <img src="/Fotos-Productos/${prod.imagen}" 
+                    <img src="${imageUrl}" 
                         class="card-img-top img-fluid object-fit-cover"
                         alt="${prod.nombre}">
                     </div>
@@ -95,47 +110,70 @@ $(document).ready(function () {
 
         if (producto) {
             const isAgotado = producto.stock === 0;
+            let images = [];
+            try {
+                images = JSON.parse(producto.imagen);
+            } catch (e) {
+                if (producto.imagen && producto.imagen !== "[]") {
+                    images = [producto.imagen];
+                }
+            }
+
+            let carouselIndicators = '';
+            let carouselItems = '';
+
+            if (images.length > 0) {
+                images.forEach((img, index) => {
+                    const activeClass = index === 0 ? 'active' : '';
+                    carouselIndicators += `<button type="button" data-bs-target="#productCarousel" data-bs-slide-to="${index}" class="${activeClass}" aria-current="${index === 0}" aria-label="Slide ${index + 1}"></button>`;
+                    carouselItems += `
+                        <div class="carousel-item ${activeClass}">
+                            <img src="/Fotos-Productos/${producto.id}/${img}" class="d-block w-100 rounded shadow-sm" alt="${producto.nombre}" style="max-height: 300px; object-fit: contain;">
+                        </div>`;
+                });
+            } else {
+                carouselItems = `
+                    <div class="carousel-item active">
+                        <img src="https://placehold.co/400" class="d-block w-100" alt="Imagen no disponible">
+                    </div>`;
+            }
+
             const modalHtml = `
                 <div class="modal fade" id="modal-Detalles" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-lg modal-dialog-centered">
                         <div class="modal-content border-0 shadow-lg">
-
-                            <!-- Header simple -->
                             <div class="modal-header border-bottom bg-light">
                                 <h5 class="modal-title fw-bold text-dark">Detalles del Producto</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
-
                             <div class="modal-body">
                                 <div class="row">
-
-                                    <!-- Imagen -->
-                                    <div class="col-md-6 text-center">
-                                        <img src="/Fotos-Productos/${producto.imagen}"
-                                            class="img-fluid rounded shadow-sm"
-                                            alt="${producto.nombre}"
-                                            style="max-height: 300px; object-fit: contain;">
+                                    <div class="col-md-6">
+                                        <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+                                            <div class="carousel-indicators">${carouselIndicators}</div>
+                                            <div class="carousel-inner">${carouselItems}</div>
+                                            <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                <span class="visually-hidden">Previous</span>
+                                            </button>
+                                            <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                <span class="visually-hidden">Next</span>
+                                            </button>
+                                        </div>
                                     </div>
-
-                                    <!-- Detalles -->
                                     <div class="col-md-6">
                                         <h4 class="fw-bold text-black mb-2">${producto.nombre}</h4>
                                         <h3 class="fw-bold text-success mb-3">S/ ${producto.precioVenta.toFixed(2)}</h3>
-
                                         <div class="mb-4">
                                             <h6 class="fw-semibold text-muted mb-2 fw-bold">Descripción:</h6>
                                             <p class="text-dark">${producto.descripcion || "Producto de calidad disponible."}</p>
                                             <p class="text-dark">Stock: ${producto.stock}</p>
-
                                         </div>
-
-                                        <!-- Cantidad -->
                                         <div class="d-flex align-items-center mb-3">
                                             <label for="cantidad-producto" class="form-label me-3 mb-0">Cantidad:</label>
                                             <input type="number" id="cantidad-producto" class="form-control w-25" value="1" min="1" max="${producto.stock}" ${isAgotado ? 'disabled' : ''}>
                                         </div>
-
-                                        <!-- Botones -->
                                         <div class="d-grid gap-2">
                                             <button class="btn btn-primary btn-lg btn-agregar" data-id="${producto.id}" ${isAgotado ? 'disabled' : ''}>
                                                 <i class="bi bi-cart-plus me-2"></i>Agregar al Carrito
@@ -145,23 +183,18 @@ $(document).ready(function () {
                                             </a>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
             `;
 
-            // Limpiar contenedor y agregar modal
             $("#modal-container").html(modalHtml);
 
-            // Configurar WhatsApp
             const mensaje = encodeURIComponent(`¡Hola! Estoy interesado en: ${producto.nombre} - S/ ${producto.precioVenta.toFixed(2)}`);
             $("#btn-whatsapp").attr("href", `https://wa.me/51913048853?text=${mensaje}`);
 
-            // Mostrar modal
             const modal = new bootstrap.Modal(document.getElementById('modal-Detalles'));
             modal.show();
         }

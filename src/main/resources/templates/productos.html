@@ -15,7 +15,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+    <link rel="icon" th:href="@{/iconos/logo2.jpg}" type="image/jpeg">
     <link rel="stylesheet" th:href="@{/css/main.css}">
 </head>
 <body>
@@ -71,12 +71,12 @@
 </div>
 
 <!-- Modal Formulario -->
-<div class="modal fade" id="productoModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
+<div class="modal fade" id="productoModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalTitle">Agregar Producto</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" ></button>
             </div>
             <div class="modal-body">
                 <form id="formProducto" novalidate>
@@ -116,11 +116,13 @@
                             <input type="number" id="stock_seguridad" name="stockSeguridad" class="form-control">
                             <div id="stock_min-error" class="invalid-feedback d-block"></div>
                         </div>
-                        <div class="col-md-6">
-                            <label for="imagen" class="form-label">Imagen:</label>
-                            <input type="file" id="imagen" name="imagen" class="form-control" accept="image/*">
-                            <img class="img-fluid w-25" id="imagenPreview" src="https://via.placeholder.com/150" alt="Vista previa">
-                            <div id="imagen-error" class="invalid-feedback d-block"></div>
+                        <div class="col-md-12">
+                            <label for="imagenes" class="form-label">Imágenes:</label>
+                            <input type="file" id="imagenes" name="imagenes" class="form-control" accept="image/*" multiple>
+                            <div id="imagenPreviewContainer" class="mt-2 d-flex flex-wrap gap-2">
+                                <!-- Las vistas previas de las imágenes se insertarán aquí dinámicamente -->
+                            </div>
+                            <div id="imagenes-error" class="invalid-feedback d-block"></div>
                         </div>
                     </div>
                 </form>

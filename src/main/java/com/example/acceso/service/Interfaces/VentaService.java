@@ -33,4 +33,6 @@ public interface VentaService {
 
     BigDecimal totalDeuda();
 
+    List<Venta> listarCuentasPorCobrarPendientes();
+
 }

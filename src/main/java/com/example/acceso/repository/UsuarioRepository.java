@@ -1,5 +1,6 @@
 package com.example.acceso.repository;
 
+import com.example.acceso.model.Perfil;
 import com.example.acceso.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -89,4 +90,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
      * @return El número de usuarios que no tienen el estado especificado.
      */
     long countByEstadoNot(Integer estado);
+
+    long countByPerfilAndEstado(Perfil perfil, Integer estado);
 }
