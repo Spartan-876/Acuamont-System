@@ -1,15 +1,16 @@
-import "dotenv/config";
-import express from "express";
-import cors from "cors";
-import mysql from "mysql2";
-import multer from "multer";
-import path from "path";
-import fs from "fs";
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const mysql = require("mysql2");
+const multer = require("multer");
+const path = require("path");
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const cloudinary = require("cloudinary");
+const multerStorageCloudinary = require("multer-storage-cloudinary");
+
+const CloudinaryStorage = multerStorageCloudinary.CloudinaryStorage ||
+    multerStorageCloudinary.default?.CloudinaryStorage ||
+    multerStorageCloudinary;
 
 const app = express();
 const port = process.env.PORT || 3002;
@@ -17,38 +18,40 @@ const port = process.env.PORT || 3002;
 app.use(cors());
 app.use(express.json());
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// --- CONFIGURACIÓN CLOUDINARY ---
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
-const uploadDir = path.join(__dirname, 'uploads');
-
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir);
-}
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');
+// --- CONFIGURACIÓN MULTER ---
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'comentarios_acuamont',
+        allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
     },
-    filename: (req, file, cb) => {
-        const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname);
-        cb(null, uniqueName);
-    }
 });
 
 const upload = multer({ storage: storage });
 
+// --- BASE DE DATOS ---
 const db = mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'acceso',
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'acceso',
+    port: process.env.DB_PORT || 3306,
     waitForConnections: true,
     connectionLimit: 10,
-    queueLimit: 0
+    queueLimit: 0,
+    ssl: {
+        rejectUnauthorized: false
+    }
 }).promise();
 
-
-// 1. GET: Listar comentarios
+// RUTAS
 app.get("/comentarios", async (req, res) => {
     try {
         const [rows] = await db.query("SELECT * FROM comentarios ORDER BY fecha DESC");
@@ -59,7 +62,6 @@ app.get("/comentarios", async (req, res) => {
     }
 });
 
-// 2. POST: Crear comentario con imagen opcional
 app.post("/comentarios", upload.single("imagen"), async (req, res) => {
     try {
         const { nombre, comentario } = req.body;
@@ -69,8 +71,9 @@ app.post("/comentarios", upload.single("imagen"), async (req, res) => {
         }
 
         let imagenUrl = null;
+        
         if (req.file) {
-            imagenUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+            imagenUrl = req.file.path || req.file.secure_url; 
         }
 
         const [result] = await db.query(
@@ -87,7 +90,7 @@ app.post("/comentarios", upload.single("imagen"), async (req, res) => {
         });
 
     } catch (error) {
-        console.error(error);
+        console.error("Error en POST:", error);
         res.status(500).json({ error: "Error al guardar el comentario" });
     }
 });

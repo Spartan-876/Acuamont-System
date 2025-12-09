@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Enviar al servidor
         fetch(API_URL, {
             method: 'POST',
-            body: formData // No se necesita 'Content-Type', el navegador lo establece automáticamente con FormData
+            body: formData
         })
         .then(response => {
             if (!response.ok) {
@@ -56,7 +56,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Función para cargar y mostrar los comentarios
     function loadComments() {
         fetch(API_URL)
             .then(response => {
@@ -74,7 +73,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
-    // Función para obtener las iniciales de un nombre
     function getInitials(name) {
         const words = name.split(' ');
         let initials = '';

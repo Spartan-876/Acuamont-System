@@ -177,7 +177,7 @@ $(document).ready(function () {
 
             $('#redSocialId').val(rowData.id);
             $('#redSocialNombre').val(rowData.nombre);
-            $('#redSocialUrl').val(rowData.url_enlace);
+            $('#redSocialUrl').val(rowData.url);
 
             modal.modal('show');
 

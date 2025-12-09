@@ -1,17 +1,11 @@
 package com.example.acceso.service.Implements;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.cloudinary.utils.ObjectUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,13 +20,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 public class ProductoServiceImpl implements ProductoService {
 
-    @Value("${file.upload-dir}")
-    private String uploadDir;
-
     private final ProductoRepository productoRepository;
+    private final CloudinaryService cloudinaryService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public ProductoServiceImpl(ProductoRepository productoRepository) {
+    public ProductoServiceImpl(ProductoRepository productoRepository, CloudinaryService cloudinaryService) {
         this.productoRepository = productoRepository;
+        this.cloudinaryService = cloudinaryService;
     }
 
     @Transactional(readOnly = true)
@@ -80,29 +74,25 @@ public class ProductoServiceImpl implements ProductoService {
 
             // Handle file uploads
             if (fotos != null && !fotos.isEmpty() && fotos.stream().anyMatch(f -> !f.isEmpty())) {
-                Path carpetaProducto = Paths.get(uploadDir, productoParaActualizar.getId().toString());
-
-                ObjectMapper objectMapper = new ObjectMapper();
-                List<String> nombresImagenes;
+                List<String> listaImagenes;
                 String jsonImagenesActual = productoParaActualizar.getImagen();
-
-                // Deserialize existing images
                 if (jsonImagenesActual != null && !jsonImagenesActual.isEmpty() && !"[]".equals(jsonImagenesActual)) {
-                    nombresImagenes = objectMapper.readValue(jsonImagenesActual, new TypeReference<List<String>>() {});
+                    try {
+                        listaImagenes = objectMapper.readValue(jsonImagenesActual, new TypeReference<List<String>>() {});
+                    } catch (JsonProcessingException e) {
+                        listaImagenes = new ArrayList<>();
+                    }
                 } else {
-                    nombresImagenes = new ArrayList<>();
+                    listaImagenes = new ArrayList<>();
                 }
-
-                // Save new images and add them to the list
+                String nombreCarpetaNube = "productos_acuamont/" + productoParaActualizar.getId();
                 for (MultipartFile foto : fotos) {
                     if (foto != null && !foto.isEmpty()) {
-                        String nombreImagen = guardarImagen(foto, carpetaProducto);
-                        nombresImagenes.add(nombreImagen);
+                        String urlImagen = cloudinaryService.subirImagen(foto, nombreCarpetaNube);
+                        listaImagenes.add(urlImagen);
                     }
                 }
-
-                // Serialize the updated list back to JSON
-                String jsonImagenesNuevo = objectMapper.writeValueAsString(nombresImagenes);
+                String jsonImagenesNuevo = objectMapper.writeValueAsString(listaImagenes);
                 productoParaActualizar.setImagen(jsonImagenesNuevo);
             }
             
@@ -154,14 +144,12 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Transactional
     public void eliminarProducto(Long id) {
-        if (id == null || id <= 0) {
-            throw new IllegalArgumentException("ID de producto inválido");
-        }
+        if (id == null || id <= 0) throw new IllegalArgumentException("ID inválido");
+
         Producto producto = obtenerProductoPorId(id)
                 .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado"));
 
-        // Delete the entire product folder
-        eliminarCarpetaProducto(producto);
+        eliminarTodasLasImagenesDeCloudinary(producto);
 
         producto.setImagen(null);
         producto.setEstado(2);
@@ -184,89 +172,70 @@ public class ProductoServiceImpl implements ProductoService {
         });
     }
 
-    /**
-     * Saves an image file into the product's specific directory.
-     *
-     * @param fotoFile The image file to save.
-     * @param carpetaProducto The path to the product's directory.
-     * @return The unique name of the saved file.
-     * @throws IOException If an error occurs during file writing.
-     */
-    private String guardarImagen(MultipartFile fotoFile, Path carpetaProducto) throws IOException {
-        Files.createDirectories(carpetaProducto);
-        String nombreUnico = UUID.randomUUID().toString() + "_" + fotoFile.getOriginalFilename();
-        Path rutaCompleta = carpetaProducto.resolve(nombreUnico);
-        Files.write(rutaCompleta, fotoFile.getBytes());
-        return nombreUnico;
-    }
-
-    /**
-     * Deletes the entire folder associated with a product, including all its images.
-     *
-     * @param producto The product whose folder is to be deleted.
-     */
-    private void eliminarCarpetaProducto(Producto producto) {
-        if (producto == null || producto.getId() == null) {
-            return;
-        }
-        try {
-            Path carpetaProducto = Paths.get(uploadDir, producto.getId().toString());
-
-            if (Files.exists(carpetaProducto) && Files.isDirectory(carpetaProducto)) {
-                Files.walk(carpetaProducto)
-                     .sorted(Comparator.reverseOrder())
-                     .map(Path::toFile)
-                     .forEach(File::delete);
-            }
-        } catch (IOException e) {
-            System.err.println("Error al eliminar la carpeta del producto " + producto.getId() + ": " + e.getMessage());
-        }
-    }
-
     @Override
     @Transactional
-    public void eliminarImagen(Long productoId, String nombreImagen) {
+    public void eliminarImagen(Long productoId, String urlImagenAEliminar) {
         Producto producto = productoRepository.findById(productoId)
-                .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado con ID: " + productoId));
+                .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado"));
 
         String jsonImagenes = producto.getImagen();
         if (jsonImagenes == null || jsonImagenes.isEmpty()) {
-            throw new IllegalArgumentException("El producto no tiene imágenes asociadas.");
+            throw new IllegalArgumentException("El producto no tiene imágenes.");
         }
 
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            List<String> nombresImagenes = objectMapper.readValue(jsonImagenes, new TypeReference<List<String>>() {});
+            List<String> listaUrls = objectMapper.readValue(jsonImagenes, new TypeReference<List<String>>() {});
 
-            if (!nombresImagenes.contains(nombreImagen)) {
+            if (!listaUrls.contains(urlImagenAEliminar)) {
                 throw new IllegalArgumentException("La imagen no pertenece al producto.");
             }
-            
-            // Construct path and delete the physical file
-            Path carpetaProducto = Paths.get(uploadDir, producto.getId().toString());
-            eliminarArchivoImagen(carpetaProducto.resolve(nombreImagen));
 
-            // Remove from list and update the product
-            nombresImagenes.remove(nombreImagen);
-            String nuevoJsonImagenes = objectMapper.writeValueAsString(nombresImagenes);
-            producto.setImagen(nuevoJsonImagenes);
+            String publicId = obtenerPublicId(urlImagenAEliminar);
+            if (publicId != null) {
+                cloudinaryService.eliminarImagen(publicId, ObjectUtils.emptyMap());
+            }
+
+            listaUrls.remove(urlImagenAEliminar);
+            String nuevoJson = objectMapper.writeValueAsString(listaUrls);
+            producto.setImagen(nuevoJson);
             productoRepository.save(producto);
 
-        } catch (IOException e) {
-            throw new RuntimeException("Error al procesar las imágenes del producto.", e);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al eliminar imagen: " + e.getMessage(), e);
         }
     }
 
-    /**
-     * Deletes a single image file from the filesystem.
-     *
-     * @param rutaImagen The full path to the image file to be deleted.
-     */
-    private void eliminarArchivoImagen(Path rutaImagen) {
+    private String obtenerPublicId(String url) {
         try {
-            Files.deleteIfExists(rutaImagen);
-        } catch (IOException e) {
-            System.err.println("Error al eliminar la imagen: " + rutaImagen.toString() + " - " + e.getMessage());
+            int inicio = url.indexOf("productos_acuamont/");
+            if (inicio == -1) return null;
+
+            String rutaConExt = url.substring(inicio);
+
+            int punto = rutaConExt.lastIndexOf(".");
+            if (punto != -1) {
+                return rutaConExt.substring(0, punto);
+            }
+            return rutaConExt;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private void eliminarTodasLasImagenesDeCloudinary(Producto producto) {
+        try {
+            String json = producto.getImagen();
+            if (json != null && !json.equals("[]")) {
+                List<String> urls = objectMapper.readValue(json, new TypeReference<List<String>>() {});
+                for (String url : urls) {
+                    String publicId = obtenerPublicId(url);
+                    if (publicId != null) {
+                        cloudinaryService.eliminarImagen(publicId, ObjectUtils.emptyMap());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error borrando imágenes de Cloudinary: " + e.getMessage());
         }
     }
 

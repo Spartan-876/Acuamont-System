@@ -13,8 +13,10 @@
         <div class="d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center justify-content-center">
                 <a th:href="@{/}" class="fs-4 text-white text-decoration-none fw-bold">Sistema Acuamont</a>
-                <img th:src="@{/iconos/logo2.jpg}" alt="acuamont"
-                    class="rounded-circle" style="width:50px; height:50px; object-fit:cover;">
+                <img th:src="@{'https://res.cloudinary.com/dukl00gcz/image/upload/iconos/logo2.jpg?v=' + ${#dates.createNow().getTime()}}"
+                     alt="acuamont"
+                     class="rounded-circle"
+                     style="width:50px; height:50px; object-fit:cover;">
             </div>
             <button id="close-sidebar" class="btn btn-dark d-md-none p-0">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg>

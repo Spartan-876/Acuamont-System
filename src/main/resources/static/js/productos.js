@@ -13,7 +13,7 @@ $(document).ready(function () {
         save: `${API_BASE}/guardar`,
         get: (id) => `${API_BASE}/${id}`,
         delete: (id) => `${API_BASE}/eliminar/${id}`,
-        deleteImage: (productoId, nombreImagen) => `${API_BASE}/eliminar-imagen/${productoId}/${nombreImagen}`,
+        deleteImage: `${API_BASE}/eliminar-imagen`,
         categorias: `${API_BASE}/categorias`,
         toggleStatus: (id) => `${API_BASE}/cambiar-estado/${id}`,
     };
@@ -41,15 +41,17 @@ $(document).ready(function () {
                 {
                     data: 'imagen', render: function (data, type, row) {
                         let imageUrl = 'https://placehold.co/150';
+
                         if (data) {
                             try {
                                 const images = JSON.parse(data);
+
                                 if (Array.isArray(images) && images.length > 0) {
-                                    imageUrl = `/Fotos-Productos/${row.id}/${images[0]}`;
+                                    imageUrl = images[0];
                                 }
                             } catch (e) {
                                 if (data && data !== "[]") {
-                                    imageUrl = `/Fotos-Productos/${row.id}/${data}`;
+                                    imageUrl = data;
                                 }
                             }
                         }
@@ -114,7 +116,7 @@ $(document).ready(function () {
                 url: 'https://cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
             },
             pageLength: 5,
-            lengthMenu: [5,10, 25, 50],
+            lengthMenu: [5, 10, 25, 50],
             dom: 'lBfrtip',
             buttons: [
                 {
@@ -266,8 +268,6 @@ $(document).ready(function () {
         const container = $('#imagenPreviewContainer');
         container.empty();
         const productoId = $('#id').val();
-        const productoNombre = $('#nombre').val();
-
         const allImagesCount = existingImageFiles.length + newImageFiles.length;
 
         if (allImagesCount === 0) {
@@ -276,30 +276,32 @@ $(document).ready(function () {
         }
 
         existingImageFiles.forEach(imageName => {
-            const fullUrl = `/Fotos-Productos/${productoId}/${imageName}`;
+            let fullUrl = imageName;
             const preview = $(`
-                <div class="position-relative d-inline-block m-1">
-                    <img src="${fullUrl}" class="rounded-3" style="width: 150px; height: 150px; object-fit: cover;" alt="Imagen de producto">
-                    <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 action-delete-image"
-                            data-imagen-nombre="${imageName}" data-producto-id="${productoId}" title="Eliminar imagen permanentemente">
-                        <i class="bi bi-trash3-fill"></i>
-                    </button>
-                </div>
-            `);
+            <div class="position-relative d-inline-block m-1">
+                <img src="${fullUrl}" class="rounded-3" style="width: 150px; height: 150px; object-fit: cover;" alt="Imagen de producto">
+                
+                <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 action-delete-image"
+                        data-imagen-nombre="${imageName}" data-producto-id="${productoId}" title="Eliminar imagen permanentemente">
+                    <i class="bi bi-trash3-fill"></i>
+                </button>
+            </div>
+        `);
             container.append(preview);
         });
 
         newImageFiles.forEach((file, index) => {
             const fullUrl = URL.createObjectURL(file);
+
             const preview = $(`
-                <div class="position-relative d-inline-block m-1">
-                    <img src="${fullUrl}" class="rounded-3" style="width: 150px; height: 150px; object-fit: cover;" alt="Nueva imagen" onload="URL.revokeObjectURL(this.src)">
-                    <button type="button" class="btn btn-sm btn-warning position-absolute top-0 end-0 m-1 action-remove-new-image"
-                            data-file-index="${index}" title="Quitar esta imagen">
-                        <i class="bi bi-x-lg"></i>
-                    </button>
-                </div>
-            `);
+            <div class="position-relative d-inline-block m-1">
+                <img src="${fullUrl}" class="rounded-3" style="width: 150px; height: 150px; object-fit: cover;" alt="Nueva imagen" onload="URL.revokeObjectURL(this.src)">
+                <button type="button" class="btn btn-sm btn-warning position-absolute top-0 end-0 m-1 action-remove-new-image"
+                        data-file-index="${index}" title="Quitar esta imagen">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        `);
             container.append(preview);
         });
     }
@@ -349,11 +351,12 @@ $(document).ready(function () {
     function handleDeleteImage(e) {
         const button = $(e.currentTarget);
         const productoId = button.data('producto-id');
+
         const nombreImagen = button.data('imagen-nombre');
 
         Swal.fire({
             title: '¿Eliminar esta imagen?',
-            text: "Esta acción no se puede revertir.",
+            text: "Esta acción eliminará la imagen de la nube y no se puede revertir.",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#dc3545',
@@ -363,21 +366,41 @@ $(document).ready(function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 showLoading(true);
-                fetch(ENDPOINTS.deleteImage(productoId, nombreImagen), { method: 'DELETE' })
-                    .then(response => response.json())
+
+                const formData = new FormData();
+                formData.append('productoId', productoId);
+                formData.append('nombreImagen', nombreImagen);
+
+                fetch(ENDPOINTS.deleteImage, {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error en la respuesta del servidor');
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         if (data.success) {
                             showNotification(data.message, 'success');
-                            existingImageFiles = existingImageFiles.filter(img => img !== nombreImagen);
+
+                            if (typeof existingImageFiles !== 'undefined') {
+                                existingImageFiles = existingImageFiles.filter(img => img !== nombreImagen);
+                            }
+
                             renderImagePreviews();
-                            dataTable.ajax.reload(null, false);
+                            if (typeof dataTable !== 'undefined') {
+                                dataTable.ajax.reload(null, false);
+                            }
+
                         } else {
                             showNotification(data.message, 'error');
                         }
                     })
                     .catch(error => {
                         console.error('Error al eliminar imagen:', error);
-                        showNotification('Error de conexión.', 'error');
+                        showNotification('Error al eliminar: ' + error.message, 'error');
                     })
                     .finally(() => showLoading(false));
             }

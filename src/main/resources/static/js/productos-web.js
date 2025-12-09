@@ -55,52 +55,66 @@ $(document).ready(function () {
 
         if (!productos.length) {
             contenedor.innerHTML = `
-                <div class="col mx-auto">
-                    <div class="alert alert-warning text-center ">
-                        No se encontraron productos
-                    </div>
-                </div>`;
+            <div class="col mx-auto">
+                <div class="alert alert-warning text-center ">
+                    No se encontraron productos
+                </div>
+            </div>`;
             return;
         }
 
         productos.forEach(prod => {
             const isAgotado = prod.stock === 0;
+
             let imageUrl = 'https://placehold.co/150';
+
             if (prod.imagen) {
                 try {
                     const images = JSON.parse(prod.imagen);
+
                     if (Array.isArray(images) && images.length > 0) {
-                        imageUrl = `/Fotos-Productos/${prod.id}/${images[0]}`;
+                        const imgRaw = images[0];
+
+                        if (imgRaw.startsWith('http')) {
+                            imageUrl = imgRaw;
+                        } else {
+                            imageUrl = `/Fotos-Productos/${prod.id}/${imgRaw}`;
+                        }
                     }
                 } catch (e) {
-                    // Fallback por si la imagen no es un JSON array
                     if (prod.imagen && prod.imagen !== "[]") {
-                        imageUrl = `/Fotos-Productos/${prod.id}/${prod.imagen}`;
+                        if (prod.imagen.startsWith('http')) {
+                            imageUrl = prod.imagen;
+                        } else {
+                            imageUrl = `/Fotos-Productos/${prod.id}/${prod.imagen}`;
+                        }
                     }
                 }
             }
 
             const productoCard = `
-            <div class="col-12 col-sm-6 col-lg-3">
-                <div class="card h-100 card-rounded border-0 shadow overflow-hidden ${isAgotado ? 'agotado-card' : ''}">
-                    ${isAgotado ? '<span class="badge bg-danger text-white position-absolute top-50 start-50 translate-middle fs-5 z-1">Agotado</span>' : ''}
-                    <div class="ratio ratio-4x3">
-                    <img src="${imageUrl}" 
-                        class="card-img-top img-fluid object-fit-cover"
-                        alt="${prod.nombre}">
-                    </div>
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title fw-bold">${prod.nombre}</h5>
-                        <p class="card-text text-secondary flex-grow-1 w-auto fw-bold">S/ ${prod.precioVenta.toFixed(2)}</p>
-                        <a href="#"
-                            class="btn text-white btn-sm btn-rounded mt-auto align-self-start m-auto btn-detalles"
-                            data-id="${prod.id}" style="background-color:#061748">
-                            Ver Detalles
-                        </a>
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="card h-100 card-rounded border-0 shadow overflow-hidden ${isAgotado ? 'agotado-card' : ''}">
+                        ${isAgotado ? '<span class="badge bg-danger text-white position-absolute top-50 start-50 translate-middle fs-5 z-1">Agotado</span>' : ''}
+                        <div class="ratio ratio-4x3">
+                        
+                        <img src="${imageUrl}" 
+                            class="card-img-top img-fluid object-fit-cover"
+                            alt="${prod.nombre}">
+                            
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title fw-bold">${prod.nombre}</h5>
+                            <p class="card-text text-secondary flex-grow-1 w-auto fw-bold">S/ ${prod.precioVenta.toFixed(2)}</p>
+                            <a href="#"
+                                class="btn text-white btn-sm btn-rounded mt-auto align-self-start m-auto btn-detalles"
+                                data-id="${prod.id}" style="background-color:#061748">
+                                Ver Detalles
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
+            `;
             contenedor.innerHTML += productoCard;
         });
     }
@@ -125,17 +139,26 @@ $(document).ready(function () {
             if (images.length > 0) {
                 images.forEach((img, index) => {
                     const activeClass = index === 0 ? 'active' : '';
+
+                    let imageUrl;
+                    if (img.startsWith('http')) {
+                        imageUrl = img;
+                    } else {
+                        imageUrl = `/Fotos-Productos/${producto.id}/${img}`;
+                    }
+
                     carouselIndicators += `<button type="button" data-bs-target="#productCarousel" data-bs-slide-to="${index}" class="${activeClass}" aria-current="${index === 0}" aria-label="Slide ${index + 1}"></button>`;
+
                     carouselItems += `
-                        <div class="carousel-item ${activeClass}">
-                            <img src="/Fotos-Productos/${producto.id}/${img}" class="d-block w-100 rounded shadow-sm" alt="${producto.nombre}" style="max-height: 300px; object-fit: contain;">
-                        </div>`;
+                    <div class="carousel-item ${activeClass}">
+                        <img src="${imageUrl}" class="d-block w-100 rounded shadow-sm" alt="${producto.nombre}" style="max-height: 300px; object-fit: contain;">
+                    </div>`;
                 });
             } else {
                 carouselItems = `
-                    <div class="carousel-item active">
-                        <img src="https://placehold.co/400" class="d-block w-100" alt="Imagen no disponible">
-                    </div>`;
+                <div class="carousel-item active">
+                    <img src="https://placehold.co/400" class="d-block w-100" alt="Imagen no disponible">
+                </div>`;
             }
 
             const modalHtml = `

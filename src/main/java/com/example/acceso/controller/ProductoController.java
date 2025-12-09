@@ -98,7 +98,7 @@ public class ProductoController {
      * @param stock          La cantidad en stock del producto.
      * @param stockSeguridad El nivel mínimo de stock de seguridad.
      * @param categoriaId    El ID de la categoría a la que pertenece el producto.
-     * @param imagen         El archivo de imagen del producto (opcional).
+     * @param imagenes         El archivo de imagen del producto (opcional).
      * @return Un {@link ResponseEntity} con el resultado de la operación.
      */
     @PostMapping("/api/guardar")
@@ -240,21 +240,26 @@ public class ProductoController {
         }
     }
 
-    @DeleteMapping("/api/eliminar-imagen/{productoId}/{nombreImagen}")
+    @PostMapping("/api/eliminar-imagen")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> eliminarImagen(@PathVariable Long productoId,
-            @PathVariable String nombreImagen) {
+    public ResponseEntity<Map<String, Object>> eliminarImagen(
+            @RequestParam Long productoId,
+            @RequestParam String nombreImagen) {
+
         Map<String, Object> response = new HashMap<>();
         try {
             productoService.eliminarImagen(productoId, nombreImagen);
+
             response.put("success", true);
             response.put("message", "Imagen eliminada correctamente");
             return ResponseEntity.ok(response);
+
         } catch (IllegalArgumentException e) {
             response.put("success", false);
             response.put("message", e.getMessage());
             return ResponseEntity.badRequest().body(response);
         } catch (Exception e) {
+            e.printStackTrace();
             response.put("success", false);
             response.put("message", "Error al eliminar la imagen: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);

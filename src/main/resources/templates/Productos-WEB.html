@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&display=swap" rel="stylesheet">
-    <link rel="icon" th:href="@{/iconos/logo2.jpg}" type="image/jpeg">
+    <link rel="icon" th:src="@{'https://res.cloudinary.com/dukl00gcz/image/upload/iconos/logo2.jpg?v=' + ${#dates.createNow().getTime()}}" type="image/jpeg">
     <link rel="stylesheet"  th:href="@{/css/header-footer-WEB.css}">
 
     <title>Productos</title>
@@ -27,7 +27,7 @@
             <div class="container-fluid p-3 d-flex text-white text-center align-items-center justify-content-center imagen-logo">
                 <h1 class="me-3 ms-3 mb-0">ACUAMONT</h1>
                 <a th:href="@{/PrincipalPage-web}" >
-                    <img class="rounded-circle img-fluid w-50 h-auto"  th:src="@{/iconos/logo2.jpg}" id="logo" alt="Acuamont logo">
+                    <img class="rounded-circle img-fluid w-50 h-auto"  th:src="@{'https://res.cloudinary.com/dukl00gcz/image/upload/iconos/logo2.jpg?v=' + ${#dates.createNow().getTime()}}" id="logo" alt="Acuamont logo">
                 </a>
             </div>
         </header>

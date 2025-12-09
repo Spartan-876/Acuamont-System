@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&display=swap" rel="stylesheet">
-    <link rel="icon" th:href="@{/iconos/logo2.jpg}" type="image/jpeg">
+    <link rel="icon" th:src="@{'https://res.cloudinary.com/dukl00gcz/image/upload/iconos/logo2.jpg?v=' + ${#dates.createNow().getTime()}}" type="image/jpeg">
     <link rel="stylesheet"  th:href="@{/css/header-footer-WEB.css}">
 
     <link rel="stylesheet"  th:href="@{/css/PrincipalPage-WEB.css}">
@@ -23,7 +23,7 @@
             <div class="container-fluid p-3 d-flex text-white text-center align-items-center justify-content-center imagen-logo">
                 <h1 class="me-3 ms-3 mb-0">ACUAMONT</h1>
                 <a th:href="@{/PrincipalPage-web}" >
-                    <img class="rounded-circle img-fluid w-50 h-auto" th:src="@{/iconos/logo2.jpg}" id="logo" alt="Acuamont logo">
+                    <img class="rounded-circle img-fluid w-50 h-auto" th:src="@{'https://res.cloudinary.com/dukl00gcz/image/upload/iconos/logo2.jpg?v=' + ${#dates.createNow().getTime()}}" id="logo" alt="Acuamont logo">
                 </a>
             </div>
         </header>
@@ -39,32 +39,25 @@
     </div>
 
     <div class="container-fluid mt-5 align-content-center p-0">
-        <div id="myCarousel" class="carousel slide shadow" data-bs-ride="carousel">
-
-            <div class="carousel-inner">
-                <div th:each="slide, iterStat : ${slides}"
-                     class="carousel-item"
-                     th:classappend="${iterStat.index == 0} ? ' active' : ''">
-                    <img th:src="@{${slide}}" class="d-block w-100" alt="slide"
-                         style="object-fit: cover;"
-                         onerror="console.error('Error cargando imagen:', this.src)">
-                </div>
-
-                <div th:if="${slides == null or slides.empty}" class="carousel-item active">
-                    <div class="d-block w-100 bg-light" style="display: flex; align-items: center; justify-content: center;">
-                        <div class="text-center">
-                            <i class="bi bi-image" style="font-size: 3rem;"></i>
-                            <p class="mt-2">No hay imágenes disponibles para el carrusel</p>
+        <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
+            
+            <div class="carousel-inner" id="carousel-container">
+                <div class="carousel-item active">
+                    <div class="d-flex justify-content-center align-items-center bg-light" style="height: 400px;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando slides...</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <button class="carousel-control-prev" type="button" data-bs-target="#myCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon"></span>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
             </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#myCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon"></span>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
             </button>
         </div>
 
@@ -160,10 +153,10 @@
                     </li>
                     <li th:each="red : ${redesSocialesActivas}" class="ms-2 me-2">
                         <a class="text-body-secondary"
-                           th:href="${red.url}"
-                           th:aria-label="${red.nombre}"
-                           target="_blank"
-                           rel="noopener noreferrer">
+                            th:href="${red.url}"
+                            th:aria-label="${red.nombre}"
+                            target="_blank"
+                            rel="noopener noreferrer">
 
                             <i th:class="${red.icono}"></i>
                         </a>
@@ -182,6 +175,54 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('carousel-container');
+
+            fetch('/slides/api/listar-urls')
+                .then(response => {
+                    if (!response.ok) throw new Error('Error en la red');
+                    return response.json();
+                })
+                .then(urls => {
+                    if (!urls || urls.length === 0) {
+                        container.innerHTML = `
+                            <div class="carousel-item active">
+                                <div class="d-block w-100 bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 400px;">
+                                    <h3>No hay imágenes disponibles</h3>
+                                </div>
+                            </div>`;
+                        return;
+                    }
+
+                    container.innerHTML = '';
+
+                    urls.forEach((url, index) => {
+                        const activeClass = index === 0 ? 'active' : '';
+
+                        const slideHtml = `
+                            <div class="carousel-item ${activeClass}">
+                                <img src="${url}"
+                                    class="d-block w-100"
+                                    alt="Slide ${index + 1}"
+                                    style="object-fit: cover; height: 500px;"
+                                    onerror="this.src='https://placehold.co/800x400?text=Error+Carga'">
+                            </div>
+                        `;
+                        container.insertAdjacentHTML('beforeend', slideHtml);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error cargando slides:', error);
+                    container.innerHTML = `
+                        <div class="carousel-item active">
+                            <div class="alert alert-danger m-5 text-center">
+                                Error al cargar las imágenes del servidor.
+                            </div>
+                        </div>`;
+                });
+        });
+    </script>
     <script th:src="@{/js/PrincipalPage-WEB.js}"></script>
 </body>
 </html>
