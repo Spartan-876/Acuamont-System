@@ -18,7 +18,7 @@ $(document).ready(function () {
     const API_PRODUCTOS = '/productos/api';
     const API_PAGOS = '/pagos/api';
     const API_BASE = '/ventas/api';
-    const API_MIAPI = 'http://localhost:3001';
+    const API_MIAPI = 'https://acuamont-system-1.onrender.com';
     const ENDPOINTS = {
         usuario: `${API_USUARIOS}/usuarioLogueado`,
         list: `${API_BASE}/listar`,

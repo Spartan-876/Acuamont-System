@@ -5,7 +5,7 @@ $(document).ready(function () {
 
     const API_CLIENTES = '/clientes/api';
     const API_BASE_URL = '/proveedores/api';
-    const API_MIAPI = 'http://localhost:3001';
+    const API_MIAPI = 'https://acuamont-system-1.onrender.com';
     const ENDPOINTS = {
         list: `${API_BASE_URL}/listar`,
         save: `${API_BASE_URL}/guardar`,

@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const API_URL = 'http://localhost:3002/comentarios';
+    const API_URL = 'https://acuamont-system.onrender.com/comentarios';
     const form = document.getElementById('comment-form');
     const listaComentarios = document.getElementById('lista-comentarios');
 
