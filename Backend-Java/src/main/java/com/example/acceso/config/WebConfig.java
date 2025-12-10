@@ -56,6 +56,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "/Contacto-web",
                         "/Comentarios-web",
                         "/productos/api/listar",
+                        "/productos/api/categorias",
                         "/categorias/api/activas"
                 );
     }
