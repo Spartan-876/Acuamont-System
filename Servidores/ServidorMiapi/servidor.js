@@ -10,8 +10,22 @@ const URL_RUC = process.env.URL_RUC;
 const app = express();
 const port = 3001;
 
+// Define quiénes pueden entrar
+const whitelist = [
+    "http://localhost:8080",
+    "https://acuamont-system-ek2h.onrender.com"
+];
+
 app.use(cors({
-    origin: "http://localhost:8080",
+    origin: function (origin, callback) {
+        if (!origin) return callback(null, true);
+        if (whitelist.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            console.log("Bloqueado por CORS:", origin);
+            callback(new Error('Not allowed by CORS'));
+        }
+    }
 }));
 
 app.use(express.json());
