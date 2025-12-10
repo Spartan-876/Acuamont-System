@@ -63,7 +63,14 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(@NonNull CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOriginPatterns("*")
+                .allowedOrigins(
+                        "http://localhost:8080",
+                        "http://localhost:3001",
+                        "http://localhost:3002",
+                        "https://acuamont-system-ek2h.onrender.com",
+                        "https://acuamont-system-1.onrender.com",
+                        "https://acuamont-system.onrender.com"
+                )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);
