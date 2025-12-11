@@ -3,7 +3,7 @@
  * Archivo: src/main/resources/static/js/perfiles.js
  */
 
-$(document).ready(function() {
+$(document).ready(function () {
     // Variables globales
     let dataTable;
     let perfilModal;
@@ -63,7 +63,7 @@ $(document).ready(function() {
                 { responsivePriority: 1, targets: 1 },
                 { responsivePriority: 2, targets: 4 },
             ],
-            language: { 
+            language: {
                 url: 'https://cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
             },
             pageLength: 10
@@ -86,10 +86,10 @@ $(document).ready(function() {
                 <button data-id="${row.id}" class="btn btn-sm btn-primary action-edit" title="Editar">
                     <i class="bi bi-pencil-square"></i>
                 </button>
-                <button data-id="${row.id}" class="btn btn-sm ${row.estado ? 'btn-warning' : 'btn-success'} action-status" title="${statusTitle}">
+                <button data-id="${row.id}" data-nombre="${row.nombre}" class="btn btn-sm ${row.estado ? 'btn-warning' : 'btn-success'} action-status" title="${statusTitle}">
                     <i class="bi ${statusIcon}"></i>
                 </button>
-                <button data-id="${row.id}" class="btn btn-sm btn-danger action-delete" title="Eliminar">
+                <button data-id="${row.id}" data-nombre="${row.nombre}" class="btn btn-sm btn-danger action-delete" title="Eliminar">
                     <i class="bi bi-trash3-fill"></i>
                 </button>
             </div>
@@ -137,18 +137,18 @@ $(document).ready(function() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(perfilData)
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                perfilModal.hide();
-                showNotification(data.message, 'success');
-                reloadTable();
-            } else {
-                showNotification(data.message, 'error');
-            }
-        })
-        .catch(error => showNotification('Error de conexión', 'error'))
-        .finally(() => showLoading(false));
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    perfilModal.hide();
+                    showNotification(data.message, 'success');
+                    reloadTable();
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            })
+            .catch(error => showNotification('Error de conexión', 'error'))
+            .finally(() => showLoading(false));
     }
 
     /**
@@ -175,6 +175,8 @@ $(document).ready(function() {
      */
     function handleToggleStatus(e) {
         const id = $(this).data('id');
+        const nombre = $(this).data('nombre');
+
 
         if (!usuario || !usuario.id) {
             showNotification('No se pudo verificar el usuario logueado. Intente recargar la página.', 'error');
@@ -185,6 +187,17 @@ $(document).ready(function() {
             Swal.fire({
                 title: 'Acción Inválida',
                 text: 'No puede inactivar su propio perfil.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar',
+                confirmButtonColor: '#dc3545'
+            });
+            return;
+        }
+
+        if (nombre === "Administrador") {
+            Swal.fire({
+                title: 'Acción Inválida',
+                text: 'No puede inactivar a los administradores',
                 icon: 'error',
                 confirmButtonText: 'Aceptar',
                 confirmButtonColor: '#dc3545'
@@ -212,6 +225,7 @@ $(document).ready(function() {
      */
     function handleDelete(e) {
         const id = $(this).data('id');
+        const nombre = $(this).data('nombre');
 
         if (!usuario || !usuario.id) {
             showNotification('No se pudo verificar el usuario logueado. Intente recargar la página.', 'error');
@@ -222,6 +236,17 @@ $(document).ready(function() {
             Swal.fire({
                 title: 'Acción Inválida',
                 text: 'No puede eliminar su propio perfil.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar',
+                confirmButtonColor: '#dc3545'
+            });
+            return;
+        }
+
+        if (nombre === "Administrador") {
+            Swal.fire({
+                title: 'Acción Inválida',
+                text: 'No puede eliminar el perfil administrador',
                 icon: 'error',
                 confirmButtonText: 'Aceptar',
                 confirmButtonColor: '#dc3545'
@@ -244,22 +269,22 @@ $(document).ready(function() {
                 fetch(ENDPOINTS.delete(id), {
                     method: 'DELETE'
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showNotification(data.message, 'success');
-                        reloadTable();
-                    } else {
-                        showNotification(data.message, 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showNotification('Error de conexión al eliminar el perfil.', 'error');
-                })
-                .finally(() => {
-                    showLoading(false);
-                });
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showNotification(data.message, 'success');
+                            reloadTable();
+                        } else {
+                            showNotification(data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('Error de conexión al eliminar el perfil.', 'error');
+                    })
+                    .finally(() => {
+                        showLoading(false);
+                    });
             }
         });
     }
@@ -312,7 +337,7 @@ $(document).ready(function() {
      */
     async function savePermissions() {
         const perfilId = $('#permisoPerfilId').val();
-        const selectedOpciones = $('#listaOpciones input:checked').map(function() {
+        const selectedOpciones = $('#listaOpciones input:checked').map(function () {
             return { id: $(this).val() };
         }).get();
 

@@ -106,10 +106,10 @@ $(document).ready(function () {
                     <button data-id="${row.id}" class="btn btn-sm ${row.estado ? 'btn-warning' : 'btn-success'} action-status" title="${statusTitle}">
                         ${statusIcon}
                     </button>
-                    <button data-id="${row.id}" class="btn btn-sm btn-danger action-delete" title="Eliminar">
+                    <button data-id="${row.id}" data-perfil="${row.perfil.nombre}"  class="btn btn-sm btn-danger action-delete" title="Eliminar">
                         <i class="bi bi-trash3-fill"></i>
                     </button>
-                    <button data-id="${row.id}" class="btn btn-sm ${row.usa2FA ? 'btn-info' : 'btn-secondary'} action-2fa" title="Configurar 2FA">
+                    // <button data-id="${row.id}" data-perfil="${row.perfil.nombre}" class="btn btn-sm ${row.usa2FA ? 'btn-info' : 'btn-secondary'} action-2fa" title="Configurar 2FA">
                         <i class="bi bi-shield-lock-fill"></i>
                     </button>
                 </div>
@@ -273,6 +273,8 @@ $(document).ready(function () {
     function handleToggleStatus(e) {
         e.preventDefault();
         const id = $(this).data('id');
+        const perfil = $(this).data('perfil');
+
 
         if (!usuario || !usuario.id) {
             showNotification('No se pudo verificar el usuario logueado. Intente recargar la página.', 'error');
@@ -283,6 +285,17 @@ $(document).ready(function () {
             Swal.fire({
                 title: 'Acción Inválida',
                 text: 'No puede inactivar su propio usuario.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar',
+                confirmButtonColor: '#dc3545'
+            });
+            return;
+        }
+
+        if (perfil === "Administrador") {
+            Swal.fire({
+                title: 'Acción Inválida',
+                text: 'No puede inactivar a los administradores',
                 icon: 'error',
                 confirmButtonText: 'Aceptar',
                 confirmButtonColor: '#dc3545'
@@ -320,6 +333,7 @@ $(document).ready(function () {
         e.preventDefault();
 
         const id = $(this).data('id');
+        const perfil = $(this).data('perfil');
 
         if (!usuario || !usuario.id) {
             showNotification('No se pudo verificar el usuario logueado. Intente recargar la página.', 'error');
@@ -330,6 +344,17 @@ $(document).ready(function () {
             Swal.fire({
                 title: 'Acción Inválida',
                 text: 'No puede eliminar su propio usuario.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar',
+                confirmButtonColor: '#dc3545'
+            });
+            return;
+        }
+
+        if (perfil === "Administrador") {
+            Swal.fire({
+                title: 'Acción Inválida',
+                text: 'No puede eliminar a los administradores',
                 icon: 'error',
                 confirmButtonText: 'Aceptar',
                 confirmButtonColor: '#dc3545'
@@ -423,21 +448,21 @@ $(document).ready(function () {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                modal2FA.hide();
-                showNotification(data.message, 'success');
-                loadUsuarios(); // Recargar para mostrar el botón actualizado
-            } else {
-                showNotification(data.message, 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error verificando código:', error);
-            showNotification('Error de conexión al verificar el código.', 'error');
-        })
-        .finally(() => showLoading(false));
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    modal2FA.hide();
+                    showNotification(data.message, 'success');
+                    loadUsuarios(); // Recargar para mostrar el botón actualizado
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error verificando código:', error);
+                showNotification('Error de conexión al verificar el código.', 'error');
+            })
+            .finally(() => showLoading(false));
     }
 
     /**
