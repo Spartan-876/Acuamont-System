@@ -1,33 +1,46 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# ========================
+#   IGNORAR SECRETOS (GLOBAL)
+# ========================
+**/.env
+**/.env.local
+**/.env.*
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-.env
-Diagrama de Clases.puml
+# ========================
+#   JAVA / MAVEN
+# ========================
+**/target/
+**/HELP.md
+**/.mvn/wrapper/maven-wrapper.jar
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
+# Archivos de Eclipse / STS 
+**/.classpath
+**/.project
+**/.settings
+**/.factorypath
+**/.springBeans
+**/.sts4-cache
 
-### VS Code ###
-.vscode/
 
-# Ignorar el archivo de propiedades que contiene secretos
-/src/main/resources/application.properties
+# ========================
+#   NODE.JS / JAVASCRIPT
+# ========================
+**/node_modules/
+**/npm-debug.log
+**/yarn-error.log
+**/dist/
 
-# Ignorar archivos de respaldo del editor
-*~
-### Archivos de configuración de entorno ###
-Servidores/ServidorMiapi/.env
+# ========================
+#   IDEs y SISTEMA
+# ========================
+# IntelliJ IDEA
+**/.idea/
+**/*.iws
+**/*.iml
+**/*.ipr
+
+# VS Code
+**/.vscode/
+
+# Mac / Windows
+**/.DS_Store
+**/Thumbs.db
